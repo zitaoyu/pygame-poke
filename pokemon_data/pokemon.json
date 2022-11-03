@@ -1,0 +1,10 @@
+{
+    "pokedex": {
+        "1": {
+            "frontSprite": "",
+            "backSprite": "",
+            "type": "",
+            "moveSet": []
+        }
+    }
+}
