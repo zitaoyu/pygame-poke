@@ -1,95 +1,111 @@
 from enum import Enum
+from utilities import *
 import pygame
 import os
 
 DEBUG = 1
-RED = (255, 0, 0)
-TILE_WIDTH      = 32
-PLAYER_HEIGHT   = 48
-PLAYER_FRONT_CROP = (7, 2, 17, 25)
-PLAYER_BACK_CROP  = (7, 34, 17, 25)
-PLAYER_LEFT_CROP  = (39, 33, 17, 25)
-PLAYER_RIGHT_CROP = (39, 2, 17, 25)
-PLAYER_SHEET    = pygame.image.load(os.path.join("assets", "player.png"))
-TILE_SHEET      = pygame.image.load(os.path.join("assets", "tileset.png"))
 
-class TileType(Enum):
-    GROUND = (0, 32, 16, 16)
-    GROUND2 = (16, 32, 16, 16)
-    FLOWER = (32, 32, 16, 16)
-    MUSH = (48, 32, 16, 16)
-    GRASS = (64, 32, 16, 16)
+# TODO: these coordinates are manually measured, this is sort of hard coded, 
+# need a more generic way of loading sprite sheets
+PLAYER_HEIGHT = 48
+PLAYER_SHEET = pygame.image.load(os.path.join("assets", "player.png"))
+PLAYER_FRONT_SURFACE = PLAYER_SHEET.subsurface(7, 2, 17, 25)
+PLAYER_BACK_SURFACE  = PLAYER_SHEET.subsurface(7, 34, 17, 25)
+PLAYER_LEFT_SURFACE  = PLAYER_SHEET.subsurface(39, 33, 17, 25)
+PLAYER_RIGHT_SURFACE = PLAYER_SHEET.subsurface(39, 2, 17, 25)
+TILE_SHEET = pygame.image.load(os.path.join("assets", "tileset.png"))
 
-class Tile:
-    def __init__(self, x, y, tileType = None):
+class EntitySurfaceType(Enum):
+    GROUND = TILE_SHEET.subsurface(0, 32, 16, 16)
+    GROUND2 = TILE_SHEET.subsurface(16, 32, 16, 16)
+    FLOWER = TILE_SHEET.subsurface(32, 32, 16, 16)
+    MUSH = TILE_SHEET.subsurface(48, 32, 16, 16)
+    GRASS = TILE_SHEET.subsurface(64, 32, 16, 16)
+
+class Entity:
+    def __init__(self, x, y, width, height, entity_surface_type: EntitySurfaceType):
         self.x = x
         self.y = y
-        self.boudingBox = pygame.Rect(x, y, TILE_WIDTH, TILE_WIDTH)
+        self.width = width * TILE_WIDTH
+        self.height = width * TILE_WIDTH
+        self.surface = entity_surface_type.value
+        self.surface = pygame.transform.scale(self.surface, (self.width, self.height))
 
-        if tileType != None:
-            self.tileType = tileType
-            tileSurface = TILE_SHEET.subsurface(tileType.value)
-            self.surface = pygame.transform.scale(tileSurface, (TILE_WIDTH, TILE_WIDTH))
-
-    def update(self, window):
+    def draw(self, window):
         if self.surface != None:
             window.blit(self.surface, (self.x, self.y))
-            if DEBUG:
-                pygame.draw.rect(window, (255, 0, 0), self.boudingBox, 1)
 
-class Player(Tile):
-    def __init__(self, x, y):
-        super().__init__(x, y)
-        self.nextX = self.x
-        self.nextY = self.y
+class SolidEntity(Entity):
+    def __init__(self, x, y, width, height, entity_surface_type: EntitySurfaceType):
+        super().__init__(x, y, width, height, entity_surface_type)
+        self.bounding_box = pygame.Rect(self.x, self.y, self.width, self.height)
 
-        self.front = PLAYER_SHEET.subsurface(PLAYER_FRONT_CROP)
-        self.back = PLAYER_SHEET.subsurface(PLAYER_BACK_CROP)
-        self.left = PLAYER_SHEET.subsurface(PLAYER_LEFT_CROP)
-        self.right = PLAYER_SHEET.subsurface(PLAYER_RIGHT_CROP)
-        self.surface = pygame.transform.scale(self.front, (TILE_WIDTH, PLAYER_HEIGHT))
-
-        self.running = False
-    
-    def update(self, window):
-        self.move()
-        window.blit(self.surface, (self.x, self.y - 16))
+    def draw(self, window):
+        super().draw(window)
         if DEBUG:
-            pygame.draw.rect(window, (255, 0, 0), self.boudingBox, 1)
+            pygame.draw.rect(window, RED, self.bounding_box, 1)
 
-    def move(self):
-        if self.x == self.nextX and self.y == self.nextY:
+
+class Player():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.next_x = x
+        self.next_y = y
+        self._front_surface = pygame.transform.scale(PLAYER_FRONT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
+        self._back_surface = pygame.transform.scale(PLAYER_BACK_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
+        self._left_surface = pygame.transform.scale(PLAYER_LEFT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
+        self._right_surface = pygame.transform.scale(PLAYER_RIGHT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
+        self.surface = self._front_surface
+        self.bounding_box = pygame.Rect(x, y, TILE_WIDTH, TILE_WIDTH)
+    
+    def draw(self, window):
+        window.blit(self.surface, (self.x, self.y - TILE_WIDTH // 2))
+        if DEBUG:
+            pygame.draw.rect(window, RED, self.bounding_box, 1)
+
+    def update(self, entity_list):
+        # check control
+        if self.x == self.next_x and self.y == self.next_y:
             keysPressed = pygame.key.get_pressed()
             if keysPressed[pygame.K_a]:
-                self.nextX =  self.x - TILE_WIDTH
-                self.surface = pygame.transform.scale(self.left, (TILE_WIDTH, PLAYER_HEIGHT))
+                self.surface = self._left_surface
+                self.next_x =  self.x - TILE_WIDTH
             elif keysPressed[pygame.K_d]:
-                self.nextX =  self.x + TILE_WIDTH
-                self.surface = pygame.transform.scale(self.right, (TILE_WIDTH, PLAYER_HEIGHT))
+                self.surface = self._right_surface
+                self.next_x =  self.x + TILE_WIDTH
             elif keysPressed[pygame.K_w]:
-                self.nextY = self.y - TILE_WIDTH
-                self.surface = pygame.transform.scale(self.back, (TILE_WIDTH, PLAYER_HEIGHT))
+                self.surface = self._back_surface
+                self.next_y = self.y - TILE_WIDTH
             elif keysPressed[pygame.K_s]:
-                self.nextY = self.y + TILE_WIDTH
-                self.surface = pygame.transform.scale(self.front, (TILE_WIDTH, PLAYER_HEIGHT))
+                self.surface = self._front_surface
+                self.next_y = self.y + TILE_WIDTH
             if keysPressed[pygame.K_k]:
                 self.running = True
             else:
                 self.running = False
-        else:
-            if self.running:
-                velocity = 4
-            else:
-                velocity = 2
-            if self.x < self.nextX:
-                self.x += velocity
-                self.boudingBox.move_ip(velocity, 0)
-            elif self.x > self.nextX:
-                self.x -= velocity
-                self.boudingBox.move_ip(-velocity, 0)
-            if self.y < self.nextY:
-                self.y += velocity
-                self.boudingBox.move_ip(0, velocity)
-            elif self.y > self.nextY:
-                self.y -= velocity
-                self.boudingBox.move_ip(0, -velocity)
+        
+        #  update position
+        if not (self.x == self.next_x and self.y == self.next_y):
+            velocity = 4 if self.running else 2
+            move_x = move_y = 0
+            if self.x < self.next_x:
+                move_x = velocity
+            elif self.x > self.next_x:
+                move_x = -velocity
+            if self.y < self.next_y:
+                move_y = velocity
+            elif self.y > self.next_y:
+                move_y = -velocity
+
+            if move_x != 0 or move_y != 0:
+                self.bounding_box.move_ip(move_x, move_y)
+                for entity in entity_list:
+                    if isinstance(entity, SolidEntity) and self.bounding_box.colliderect(entity.bounding_box):
+                        self.bounding_box.move_ip(-move_x, -move_y)
+                        self.next_x = self.x
+                        self.next_y = self.y
+                        move_x = move_y = 0
+                        break
+                self.x += move_x
+                self.y += move_y

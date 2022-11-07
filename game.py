@@ -1,13 +1,16 @@
 from pygame.locals import *
 from sound_player import SoundPlayer
-from entity import Tile, TileType, Player, TILE_WIDTH
+from entity import *
 from battlescene import *
+from utilities import *
 import pygame
 import json
 import time
 
 class OpenWorld:
-    def __init__(self):
+    def __init__(self, window, player: Player):
+        self.window = window
+        self.player = player
         self.sound_player = SoundPlayer()
         self.entity_list = []
         self.load_map()
@@ -26,38 +29,39 @@ class OpenWorld:
             x = 0
             for tile in row:
                 if tile == 0:
-                    self.__add_entity(Tile(x, y, TileType.GROUND))
+                    self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.GROUND))
                 elif tile == 1:
-                    self.__add_entity(Tile(x, y, TileType.GROUND2))
+                    self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.GROUND2))
                 elif tile == 2:
-                    self.__add_entity(Tile(x, y, TileType.FLOWER))
+                    self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.FLOWER))
                 elif tile == 3:
-                    self.__add_entity(Tile(x, y, TileType.MUSH))
+                    self.__add_entity(SolidEntity(x, y, 1, 1, EntitySurfaceType.MUSH))
                 elif tile == 4:
-                    self.__add_entity(Tile(x, y, TileType.GRASS))
+                    self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.GRASS))
                 x += TILE_WIDTH
             y += TILE_WIDTH
 
+    def draw_entity_list(self):
+        self.window.fill(WHITE)
+        for entity in self.entity_list:
+            entity.draw(self.window)
+        self.player.update(self.entity_list)
+        self.player.draw(self.window)
+
+FPS = 60
+WIDTH = 640
+HEIGHT = 480
+GAME_NAME = "Pokemon Light"
+
 class Game:
-
-    FPS = 60
-    WHITE = (255, 255, 255)
-    WIDTH = 640
-    HEIGHT = 480
-    NAME = "Pokemon Light"
-
     def __init__(self):
-        self.window = pygame.display.set_mode((Game.WIDTH, Game.HEIGHT))
-        pygame.display.set_caption(Game.NAME)
-        self.open_world = OpenWorld()
+        self.window = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption(GAME_NAME)
         self.player = Player(64, 64)
+        self.open_world = OpenWorld(self.window, self.player)
 
     def draw_window(self):
-        self.window.fill(Game.WHITE)
-        for entity in self.open_world.entity_list:
-            entity.update(self.window)
-        self.player.update(self.window)
-        self.check_player_collision()
+        self.open_world.draw_entity_list()
         pygame.display.update()
 
     def run(self):
@@ -65,42 +69,12 @@ class Game:
         clock = pygame.time.Clock()
         run = True
         while run:
-            clock.tick(Game.FPS)
+            clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
             self.draw_window()
         pygame.quit()
-
-    def check_player_collision(self):
-        x = self.player.x
-        y = self.player.y
-        nextX = self.player.nextX
-        nextY = self.player.nextY
-
-        if x != nextX or y != nextY:
-            collide_tile = None
-            for entity in self.open_world.entity_list:
-                if entity.x == nextX and entity.y == nextY:
-                    collide_tile = entity
-                    break
-            if collide_tile:
-                if collide_tile.tileType == TileType.MUSH:
-                    if x < nextX:
-                        nextX -= TILE_WIDTH
-                    elif x > nextX:
-                        nextX += TILE_WIDTH
-                    elif y < nextY:
-                        nextY -= TILE_WIDTH
-                    elif y > nextY:
-                        nextY += TILE_WIDTH
-                    self.player.nextX = nextX
-                    self.player.x = self.player.nextX
-                    self.player.nextY = nextY
-                    self.player.y = self.player.nextY
-                elif collide_tile.tileType == TileType.GRASS:
-                    if (int) (time.time()) % 4 == 0:
-                        print("Encounter!")
 
 def main():
     Game().run()
