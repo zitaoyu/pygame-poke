@@ -43,9 +43,9 @@ class OpenWorld:
 
     def draw_entity_list(self):
         self.window.fill(WHITE)
+        self.player.update(self.entity_list)
         for entity in self.entity_list:
             entity.draw(self.window)
-        self.player.update(self.entity_list)
         self.player.draw(self.window)
 
 FPS = 60
@@ -57,7 +57,7 @@ class Game:
     def __init__(self):
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_NAME)
-        self.player = Player(64, 64)
+        self.player = Player(9 * TILE_WIDTH, 7 * TILE_WIDTH)
         self.open_world = OpenWorld(self.window, self.player)
 
     def draw_window(self):

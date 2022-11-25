@@ -52,13 +52,26 @@ class Player():
         self.y = y
         self.next_x = x
         self.next_y = y
+
+        self.camera_x = 0
+        self.camera_y = 0
+        self.next_camera_x = 0
+        self.next_camera_y = 0
+
+        # sprites
         self._front_surface = pygame.transform.scale(PLAYER_FRONT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
         self._back_surface = pygame.transform.scale(PLAYER_BACK_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
         self._left_surface = pygame.transform.scale(PLAYER_LEFT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
         self._right_surface = pygame.transform.scale(PLAYER_RIGHT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
         self.surface = self._front_surface
+
+        # bounding boxes
         self.bounding_box = pygame.Rect(x, y, TILE_WIDTH, TILE_WIDTH)
-    
+        self._top_bounding_box = pygame.Rect(x, y - TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
+        self._bottom_bounding_box = pygame.Rect(x, y + TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
+        self._left_bounding_box = pygame.Rect(x - TILE_WIDTH, y, TILE_WIDTH, TILE_WIDTH)
+        self._right_bounding_box = pygame.Rect(x + TILE_WIDTH, y, TILE_WIDTH, TILE_WIDTH)
+        
     def draw(self, window):
         window.blit(self.surface, (self.x, self.y - TILE_WIDTH // 2))
         if DEBUG:
@@ -66,46 +79,63 @@ class Player():
 
     def update(self, entity_list):
         # check control
-        if self.x == self.next_x and self.y == self.next_y:
+        if self.camera_x == self.next_camera_x and self.camera_y == self.next_camera_y:
             keysPressed = pygame.key.get_pressed()
             if keysPressed[pygame.K_a]:
                 self.surface = self._left_surface
-                self.next_x =  self.x - TILE_WIDTH
+                if not is_bb_collide_with_entity_list(self._left_bounding_box, entity_list):
+                    self.next_camera_x =  self.camera_x + TILE_WIDTH
             elif keysPressed[pygame.K_d]:
                 self.surface = self._right_surface
-                self.next_x =  self.x + TILE_WIDTH
+                if not is_bb_collide_with_entity_list(self._right_bounding_box, entity_list):
+                    self.next_camera_x =  self.camera_x - TILE_WIDTH
             elif keysPressed[pygame.K_w]:
                 self.surface = self._back_surface
-                self.next_y = self.y - TILE_WIDTH
+                if not is_bb_collide_with_entity_list(self._top_bounding_box, entity_list):
+                    self.next_camera_y = self.camera_y + TILE_WIDTH
             elif keysPressed[pygame.K_s]:
                 self.surface = self._front_surface
-                self.next_y = self.y + TILE_WIDTH
+                if not is_bb_collide_with_entity_list(self._bottom_bounding_box, entity_list):
+                    self.next_camera_y = self.camera_y - TILE_WIDTH
             if keysPressed[pygame.K_k]:
                 self.running = True
             else:
                 self.running = False
         
         #  update position
-        if not (self.x == self.next_x and self.y == self.next_y):
+        if not (self.camera_x == self.next_camera_x and self.camera_y == self.next_camera_y):
             velocity = 4 if self.running else 2
             move_x = move_y = 0
-            if self.x < self.next_x:
+            if self.camera_x < self.next_camera_x:
                 move_x = velocity
-            elif self.x > self.next_x:
+            elif self.camera_x > self.next_camera_x:
                 move_x = -velocity
-            if self.y < self.next_y:
+            if self.camera_y < self.next_camera_y:
                 move_y = velocity
-            elif self.y > self.next_y:
+            elif self.camera_y > self.next_camera_y:
                 move_y = -velocity
 
-            if move_x != 0 or move_y != 0:
-                self.bounding_box.move_ip(move_x, move_y)
-                for entity in entity_list:
-                    if isinstance(entity, SolidEntity) and self.bounding_box.colliderect(entity.bounding_box):
-                        self.bounding_box.move_ip(-move_x, -move_y)
-                        self.next_x = self.x
-                        self.next_y = self.y
-                        move_x = move_y = 0
-                        break
-                self.x += move_x
-                self.y += move_y
+            # self.bounding_box.move_ip(move_x, move_y)
+            # for entity in entity_list:
+            #     if isinstance(entity, SolidEntity) and self.bounding_box.colliderect(entity.bounding_box):
+            #         self.bounding_box.move_ip(-move_x, -move_y)
+            #         self.next_camera_x = self.camera_x
+            #         self.next_camera_y = self.camera_y
+            #         move_x = move_y = 0
+            #         break
+            self.camera_x += move_x
+            self.camera_y += move_y
+            move_entity_list(entity_list, move_x, move_y)
+
+def move_entity_list(entity_list, move_x, move_y):
+    for entity in entity_list:
+        entity.x += move_x
+        entity.y += move_y
+        if isinstance(entity, SolidEntity):
+            entity.bounding_box.move_ip(move_x, move_y)
+
+def is_bb_collide_with_entity_list(bb, entity_list):
+    for entity in entity_list:
+        if isinstance(entity, SolidEntity) and bb.colliderect(entity.bounding_box):
+            return True
+    return False
