@@ -1,6 +1,8 @@
 TILE_WIDTH = 32
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
+CAMREA_CENTER_X = 9 * TILE_WIDTH
+CAMREA_CENTER_Y = 7 * TILE_WIDTH
 
 class Coordinate:
     def __init__(self, x, y):

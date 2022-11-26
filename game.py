@@ -5,7 +5,6 @@ from battlescene import *
 from utilities import *
 import pygame
 import json
-import time
 
 class OpenWorld:
     def __init__(self, window, player: Player):
@@ -13,20 +12,21 @@ class OpenWorld:
         self.player = player
         self.sound_player = SoundPlayer()
         self.entity_list = []
-        self.load_map()
+        self.load_map(player_start_x=10 * TILE_WIDTH, player_start_y=0)
 
     def __add_entity(self, entity):
         self.entity_list.append(entity)
 
-    def load_map(self, map=None):
+    def load_map(self, player_start_x=0, player_start_y=0, map=None):
         self.entity_list = []
         object = json.load(open("./Maps/map.json"))["testMap"]
         map = object["map"]
         background_music = object["backgroundMusic"]
         self.sound_player.play_track(background_music)
-        x = y =  0
+        x = -(player_start_x - CAMREA_CENTER_X)
+        y = -(player_start_y - CAMREA_CENTER_Y)
         for row in map:
-            x = 0
+            x = -(player_start_x - CAMREA_CENTER_X)
             for tile in row:
                 if tile == 0:
                     self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.GROUND))
@@ -40,6 +40,7 @@ class OpenWorld:
                     self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.GRASS))
                 x += TILE_WIDTH
             y += TILE_WIDTH
+        self.player.x
 
     def draw_entity_list(self):
         self.window.fill(WHITE)
@@ -57,7 +58,7 @@ class Game:
     def __init__(self):
         self.window = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(GAME_NAME)
-        self.player = Player(9 * TILE_WIDTH, 7 * TILE_WIDTH)
+        self.player = Player()
         self.open_world = OpenWorld(self.window, self.player)
 
     def draw_window(self):

@@ -47,7 +47,10 @@ class SolidEntity(Entity):
 
 
 class Player():
-    def __init__(self, x, y):
+    
+    def __init__(self):
+        x = CAMREA_CENTER_X
+        y = CAMREA_CENTER_Y
         self.x = x
         self.y = y
         self.next_x = x
