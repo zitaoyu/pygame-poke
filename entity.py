@@ -1,10 +1,16 @@
-from enum import Enum
-from utilities import *
-import pygame
 import os
+from enum import Enum
 
-DEBUG = 1
+import pygame
 
+from animation import *
+from utilities import *
+
+# show red bounding box toggle
+DEBUG = 0
+
+CAMREA_CENTER_X = 9 * TILE_WIDTH
+CAMREA_CENTER_Y = 7 * TILE_WIDTH
 # TODO: these coordinates are manually measured, this is sort of hard coded, 
 # need a more generic way of loading sprite sheets
 PLAYER_HEIGHT = 48
@@ -13,27 +19,31 @@ PLAYER_FRONT_SURFACE = PLAYER_SHEET.subsurface(7, 2, 17, 25)
 PLAYER_BACK_SURFACE  = PLAYER_SHEET.subsurface(7, 34, 17, 25)
 PLAYER_LEFT_SURFACE  = PLAYER_SHEET.subsurface(39, 33, 17, 25)
 PLAYER_RIGHT_SURFACE = PLAYER_SHEET.subsurface(39, 2, 17, 25)
-TILE_SHEET = pygame.image.load(os.path.join("assets", "tileset.png"))
+
+FLOWER_SS = pygame.image.load(os.path.join("assets", "flower.png"))
 
 class EntitySurfaceType(Enum):
-    GROUND = TILE_SHEET.subsurface(0, 32, 16, 16)
-    GROUND2 = TILE_SHEET.subsurface(16, 32, 16, 16)
-    FLOWER = TILE_SHEET.subsurface(32, 32, 16, 16)
-    MUSH = TILE_SHEET.subsurface(48, 32, 16, 16)
-    GRASS = TILE_SHEET.subsurface(64, 32, 16, 16)
+    GROUND  = [pygame.image.load(os.path.join("assets", "ground_0.png"))]
+    GROUND2 = [pygame.image.load(os.path.join("assets", "ground_1.png"))]
+    FLOWER  = [FLOWER_SS.subsurface(0, 0, 32, 32), FLOWER_SS.subsurface(32, 0, 32, 32)]
+    MUSH    = [pygame.image.load(os.path.join("assets", "mushroom.png"))]
+    GRASS   = [pygame.image.load(os.path.join("assets", "grass.png"))]
+    TREE    = [pygame.image.load(os.path.join("assets", "tree.png"))]
 
 class Entity:
     def __init__(self, x, y, width, height, entity_surface_type: EntitySurfaceType):
         self.x = x
         self.y = y
         self.width = width * TILE_WIDTH
-        self.height = width * TILE_WIDTH
-        self.surface = entity_surface_type.value
-        self.surface = pygame.transform.scale(self.surface, (self.width, self.height))
+        self.height = height * TILE_WIDTH
+
+        sprite_list = entity_surface_type.value
+        for i in range(len(sprite_list)):
+            sprite_list[i] = pygame.transform.scale(sprite_list[i], (self.width, self.height))
+        self.animation = Animation(sprite_list, HALF_SEC_INTERVAL)
 
     def draw(self, window):
-        if self.surface != None:
-            window.blit(self.surface, (self.x, self.y))
+        window.blit(self.animation.get_sprite(), (self.x, self.y))
 
 class SolidEntity(Entity):
     def __init__(self, x, y, width, height, entity_surface_type: EntitySurfaceType):
@@ -47,14 +57,11 @@ class SolidEntity(Entity):
 
 
 class Player():
-    
     def __init__(self):
-        x = CAMREA_CENTER_X
-        y = CAMREA_CENTER_Y
-        self.x = x
-        self.y = y
-        self.next_x = x
-        self.next_y = y
+        self.x = CAMREA_CENTER_X
+        self.y = CAMREA_CENTER_Y
+        self.next_x = CAMREA_CENTER_X
+        self.next_y = CAMREA_CENTER_Y
 
         self.camera_x = 0
         self.camera_y = 0
@@ -69,11 +76,11 @@ class Player():
         self.surface = self._front_surface
 
         # bounding boxes
-        self.bounding_box = pygame.Rect(x, y, TILE_WIDTH, TILE_WIDTH)
-        self._top_bounding_box = pygame.Rect(x, y - TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
-        self._bottom_bounding_box = pygame.Rect(x, y + TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
-        self._left_bounding_box = pygame.Rect(x - TILE_WIDTH, y, TILE_WIDTH, TILE_WIDTH)
-        self._right_bounding_box = pygame.Rect(x + TILE_WIDTH, y, TILE_WIDTH, TILE_WIDTH)
+        self.bounding_box = pygame.Rect(self.x, self.y, TILE_WIDTH, TILE_WIDTH)
+        self._top_bounding_box = pygame.Rect(self.x, self.y - TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
+        self._bottom_bounding_box = pygame.Rect(self.x, self.y + TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
+        self._left_bounding_box = pygame.Rect(self.x - TILE_WIDTH, self.y, TILE_WIDTH, TILE_WIDTH)
+        self._right_bounding_box = pygame.Rect(self.x + TILE_WIDTH, self.y, TILE_WIDTH, TILE_WIDTH)
         
     def draw(self, window):
         window.blit(self.surface, (self.x, self.y - TILE_WIDTH // 2))
@@ -118,17 +125,15 @@ class Player():
             elif self.camera_y > self.next_camera_y:
                 move_y = -velocity
 
-            # self.bounding_box.move_ip(move_x, move_y)
-            # for entity in entity_list:
-            #     if isinstance(entity, SolidEntity) and self.bounding_box.colliderect(entity.bounding_box):
-            #         self.bounding_box.move_ip(-move_x, -move_y)
-            #         self.next_camera_x = self.camera_x
-            #         self.next_camera_y = self.camera_y
-            #         move_x = move_y = 0
-            #         break
             self.camera_x += move_x
             self.camera_y += move_y
             move_entity_list(entity_list, move_x, move_y)
+
+
+
+'''
+Helper functions
+'''
 
 def move_entity_list(entity_list, move_x, move_y):
     for entity in entity_list:

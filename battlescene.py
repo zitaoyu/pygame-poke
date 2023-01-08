@@ -1,9 +1,11 @@
+import os
 import time
+
 import pygame
 from pygame.locals import *
+
 from entity import TILE_WIDTH
 from game import Game
-import os
 
 # temporary
 BACKGROUND = pygame.image.load(os.path.join("Assets", "battleBackground.png"))
