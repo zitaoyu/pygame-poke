@@ -42,7 +42,9 @@ def download_pokedex_data_to_json():
             if len(version_group_details) > 0:
                 last_version_group = version_group_details[len(version_group_details) - 1]
                 version_group = last_version_group["version_group"]["name"]
+            id = int(move["move"]["url"].split('/')[-2])
             moves.append({
+                "id" : id,
                 "name" : move["move"]["name"],
                 "level_learned_at" : last_version_group["level_learned_at"],
                 "move_learn_method" : last_version_group["move_learn_method"]["name"],
@@ -106,7 +108,6 @@ def download_moves_data_to_json():
             "accuracy" : move_data["accuracy"],
             "damage_class" : move_data["damage_class"]["name"],
             "effect_chance" : move_data["effect_chance"],
-            "effect_changes" : move_data["effect_changes"],
             "effect_entries": {
                                 "effect" : effect,
                                 "short_effect" : short_effect
