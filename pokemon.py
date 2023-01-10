@@ -24,7 +24,9 @@ MOVES = MovesBank()
 
 
 class Move:
-    def __init__(self, data):
+    def __init__(self, id):
+        data = MOVES.get(id)
+
         self.id = data["id"]
         self.accuracy = data["accuracy"]
         self.damage_class = data["damage_class"]
@@ -45,6 +47,19 @@ class Move:
                 "stat": change["stat"]["name"]
             })
 
+class MoveSet:
+    def __init__(self, moves=None):
+        self.move_set = [None] * 4
+
+        for i in range(len(moves)):
+            self.move_set[i] = moves[i]
+    
+    def __str__(self) -> str:
+        string = ""
+        for move in self.move_set:
+            string += "\n\nName: " + move.name + "\nPower: " + str(move.power) + "\nAccuracy:" + str(move.accuracy) + "\nType: "+ move.type + "\nPP: " + str(move.pp) +"\nEffect: " + move.short_effect
+        return string
+
 class MovePool:
     def __init__(self, moves_data):
         self.level_up_moves = []
@@ -63,16 +78,25 @@ class MovePool:
             elif method == "tutor":
                 self.tutor_moves.append(move)
 
-    def get_four_random_move(self):
-        moves_total = len(self.level_up_moves)
-        four_random_move = []
-        for num in random.sample(range(moves_total), 4):
-            move_id = self.level_up_moves[num]["id"]
-            move_data = MovesBank().get(move_id)
-            move = Move(move_data)
-            four_random_move.append(move)
+    def get_default_moveset(self, level=1):
+        available_moves = []
+        for move in self.level_up_moves:
+            if level >= move["level_learned_at"]:
+                available_moves.append(move)
+        size = len(available_moves)
 
-        return four_random_move
+        default_moves = []
+        if size <= 4:
+            for move in available_moves:
+                id = move["id"]
+                default_moves.append(Move(id))
+        else:
+            for num in random.sample(range(size), 4):
+                id = self.level_up_moves[num]["id"]
+                default_moves.append(Move(id))
+
+        return MoveSet(default_moves)
+
 
 class BaseStats:
     def __init__(self, stats):
@@ -118,7 +142,7 @@ class Pokemon:
 
         # moves
         self.move_pool = MovePool(data["moves"])
-        self.move_set = self.move_pool.get_four_random_move()
+        self.move_set = self.move_pool.get_default_moveset(self.level)
 
         # IVs and EVs initialization
         self._generate_ivs()
@@ -144,6 +168,8 @@ class Pokemon:
 
     def _update_stats(self):
         # formula source: https://bulbapedia.bulbagarden.net/wiki/Stat
+        # calculator: https://pycosites.com/pkmn/stat.php
+        # 
         #       | (2 * Base + IV + [EV / 4]) * Level | 
         # HP =  |____________________________________| + Level + 10
         #       |                100                 |
@@ -160,8 +186,7 @@ class Pokemon:
         string = "Pokemon: " + self.name
         string += "\nBase stats: " + str(self.base_stats.get_base_stats())
         string += "\nMove set:"
-        for move in self.move_set:
-            string += "\n\nName: " + move.name + "\nPower: " + str(move.power) + "\nAccuracy:" + str(move.accuracy) + "\nType: "+ move.type + "\nPP: " + str(move.pp) +"\nEffect: " + move.short_effect
+        string += self.move_set.__str__()
         string += "\n\nStats:"
         string += "\nHP: " + str(self.hp) + "\t\t\tIV: " + str(self.hp_iv) + "\tEV: " + str(self.hp_ev)
         string += "\nAttack: "  + str(self.attack) + "\t\tIV: " + str(self.attack_iv) + "\tEV: " + str(self.attack_ev)
@@ -172,5 +197,12 @@ class Pokemon:
 
         return string
 
-pkm = Pokemon(6, 60)
-print(str(pkm))
+class PokemonParty:
+    def __init__(self, pokemons):
+        self.pokemon_party = [None] * 6
+
+        for i in range(len(pokemons)):
+            self.pokemon_party[i] = pokemons[i]
+
+    def get_leading_pokemon(self):
+        return self.pokemon_party[0]
