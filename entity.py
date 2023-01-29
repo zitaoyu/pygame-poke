@@ -1,7 +1,4 @@
 import os
-from enum import Enum
-
-import pygame
 
 from animation import *
 from utilities import *
@@ -90,24 +87,24 @@ class Player():
     def update(self, entity_list):
         # check control
         if self.camera_x == self.next_camera_x and self.camera_y == self.next_camera_y:
-            keysPressed = pygame.key.get_pressed()
-            if keysPressed[pygame.K_a]:
+            keys_pressed = pygame.key.get_pressed()
+            if keys_pressed[pygame.K_a]:
                 self.surface = self._left_surface
                 if not is_bb_collide_with_entity_list(self._left_bounding_box, entity_list):
                     self.next_camera_x =  self.camera_x + TILE_WIDTH
-            elif keysPressed[pygame.K_d]:
+            elif keys_pressed[pygame.K_d]:
                 self.surface = self._right_surface
                 if not is_bb_collide_with_entity_list(self._right_bounding_box, entity_list):
                     self.next_camera_x =  self.camera_x - TILE_WIDTH
-            elif keysPressed[pygame.K_w]:
+            elif keys_pressed[pygame.K_w]:
                 self.surface = self._back_surface
                 if not is_bb_collide_with_entity_list(self._top_bounding_box, entity_list):
                     self.next_camera_y = self.camera_y + TILE_WIDTH
-            elif keysPressed[pygame.K_s]:
+            elif keys_pressed[pygame.K_s]:
                 self.surface = self._front_surface
                 if not is_bb_collide_with_entity_list(self._bottom_bounding_box, entity_list):
                     self.next_camera_y = self.camera_y - TILE_WIDTH
-            if keysPressed[pygame.K_k]:
+            if keys_pressed[pygame.K_k]:
                 self.running = True
             else:
                 self.running = False

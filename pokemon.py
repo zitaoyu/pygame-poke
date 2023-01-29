@@ -1,27 +1,51 @@
 import json
 import random
+from typing import List
+from utilities import *
 from data_downloader import POKEDEX_DATA_PATH, MOVES_DATA_PATH
 
 
 class Pokedex:
     def __init__(self):
         with open(POKEDEX_DATA_PATH, 'r') as pokedex_data:
-            self._pokedex = json.load(pokedex_data)["pokedex"]
+            self.__pokedex = json.load(pokedex_data)["pokedex"]
 
     def get(self, id):
-        return self._pokedex[id - 1]
+        return self.__pokedex[id - 1]
 
 class MovesBank:
     def __init__(self):
         with open(MOVES_DATA_PATH, 'r') as moves_data:
-            self._moves_data = json.load(moves_data)["moves"]
+            self.__moves_data = json.load(moves_data)["moves"]
 
     def get(self, id):
-        return self._moves_data[id - 1]
+        return self.__moves_data[id - 1]
 
 POKEDEX = Pokedex()
 MOVES = MovesBank()
 
+class Type(Enum):
+    NORMAL = "normal"
+    FIRE = "fire"
+    WATER = "water"
+    GRASS = "grass"
+    ELECTRIC = "electric"
+    ICE = "ice"
+    FIGHTING = "fighting"
+    POISON = "poison"
+    GROUND = "ground"
+    FLYING = "flying"
+    PSYCHIC = "psychic"
+    BUG = "bug"
+    ROCK = "rock"
+    GHOST = "ghost"
+    DARK = "dark"
+    DRAGON = "dragon"
+    STEEL = "steel"
+    FAIRY = "fairy"
+
+    def type_chart(attack_type, defense_type):
+        pass
 
 class Move:
     def __init__(self, id):
@@ -36,9 +60,10 @@ class Move:
         self.name = data["name"]
         self.power = data["power"]
         self.pp = data["pp"]
+        self.current_pp = self.pp
         self.priority = data["priority"]
         self.target = data["target"]
-        self.type = data["type"]
+        self.type = Type(data["type"])
         
         self.stat_change = []
         for change in data["stat_changes"]:
@@ -48,15 +73,35 @@ class Move:
             })
 
 class MoveSet:
-    def __init__(self, moves=None):
-        self.move_set = [None] * 4
+    def __init__(self, moves: List[Move]):
+        self.__moves: List[Move] = [None] * 4
 
         for i in range(len(moves)):
-            self.move_set[i] = moves[i]
-    
+            self.__moves[i] = moves[i]
+
+    def get_move_with_index(self, index) -> Move:
+        return self.__moves[index]
+
+    def replace_move(self, move: Move, index) -> None:
+        self.__moves[index] = move
+
+    def get_size(self) -> int:
+        size = 0
+        for move in self.__moves:
+            if move != None:
+                size += 1
+        return size
+
+    def get_move_names(self) -> list[str]:
+        names = []
+        for move in self.__moves:
+            if move != None:
+                names.append(move.name)
+        return names
+
     def __str__(self) -> str:
         string = ""
-        for move in self.move_set:
+        for move in self.__moves:
             string += "\n\nName: " + move.name + "\nPower: " + str(move.power) + "\nAccuracy:" + str(move.accuracy) + "\nType: "+ move.type + "\nPP: " + str(move.pp) +"\nEffect: " + move.short_effect
         return string
 
@@ -78,7 +123,7 @@ class MovePool:
             elif method == "tutor":
                 self.tutor_moves.append(move)
 
-    def get_default_moveset(self, level=1):
+    def get_default_moveset(self, level=1) -> MoveSet:
         available_moves = []
         for move in self.level_up_moves:
             if level >= move["level_learned_at"]:
@@ -96,7 +141,6 @@ class MovePool:
                 default_moves.append(Move(id))
 
         return MoveSet(default_moves)
-
 
 class BaseStats:
     def __init__(self, stats):
@@ -137,15 +181,17 @@ class Pokemon:
         # retrieve pokemon data
         data = POKEDEX.get(id)
         self.name = data["name"]
-        self.type = data["types"]
+        self.types: List[Type] = []
+        for type in data["types"]:
+            self.types.append(Type(type))
         self.base_stats = BaseStats(data["stats"])
 
         # moves
         self.move_pool = MovePool(data["moves"])
-        self.move_set = self.move_pool.get_default_moveset(self.level)
+        self.move_set: MoveSet = self.move_pool.get_default_moveset(self.level)
 
         # IVs and EVs initialization
-        self._generate_ivs()
+        self.__generate_ivs()
         self.hp_ev = 0
         self.attack_ev = 0
         self.defense_ev = 0
@@ -154,10 +200,11 @@ class Pokemon:
         self.speed_ev = 0
 
         # calculate stats
-        self._update_stats()
+        self.__update_stats()
+        self.current_hp = self.hp
+        self.fainted = False
 
-
-    def _generate_ivs(self):
+    def __generate_ivs(self):
         ivs = random.sample(range(32), 6)
         self.hp_iv = ivs[0]
         self.attack_iv = ivs[1]
@@ -166,7 +213,7 @@ class Pokemon:
         self.special_defense_iv = ivs[4]
         self.speed_iv = ivs[5]
 
-    def _update_stats(self):
+    def __update_stats(self):
         # formula source: https://bulbapedia.bulbagarden.net/wiki/Stat
         # calculator: https://pycosites.com/pkmn/stat.php
         # 
@@ -181,6 +228,16 @@ class Pokemon:
         self.special_attack = calculate_stat(self.base_stats.special_attack, self.special_attack_iv, self.special_attack_ev, self.level)
         self.special_defense = calculate_stat(self.base_stats.special_defense, self.special_defense_iv, self.special_defense_ev, self.level)
         self.speed = calculate_stat(self.base_stats.speed, self.speed_iv, self.speed_ev, self.level)
+
+    def take_damage(self, damage):
+        self.current_hp -= damage
+        if self.current_hp <= 0:
+            self.current_hp = 0
+            self.fainted = True
+    
+    def fully_heal(self):
+        self.current_hp = self.hp
+        self.fainted = False
 
     def __str__(self) -> str:
         string = "Pokemon: " + self.name
@@ -204,5 +261,5 @@ class PokemonParty:
         for i in range(len(pokemons)):
             self.pokemon_party[i] = pokemons[i]
 
-    def get_leading_pokemon(self):
+    def get_leading_pokemon(self) -> Pokemon:
         return self.pokemon_party[0]

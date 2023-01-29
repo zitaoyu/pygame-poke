@@ -1,11 +1,11 @@
 import json
 
 from entity import *
-from sound_player import SoundPlayer
+from utilities import *
 
 
 class OpenWorld:
-    def __init__(self, window, player: Player):
+    def __init__(self, window: Surface, player: Player):
         self.window = window
         self.player = player
         self.sound_player = SoundPlayer()
