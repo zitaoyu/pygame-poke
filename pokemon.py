@@ -175,34 +175,35 @@ class BaseStats:
 
 class Pokemon:
     def __init__(self, id, level=1):
-        self.id = id
-        self.level = level
+        self.id: int = id
+        self.level: int = level
 
         # retrieve pokemon data
         data = POKEDEX.get(id)
-        self.name = data["name"]
+        self.name: str = data["name"]
+        self.nickname: str = self.name.capitalize()
         self.types: List[Type] = []
         for type in data["types"]:
             self.types.append(Type(type))
-        self.base_stats = BaseStats(data["stats"])
+        self.base_stats: BaseStats = BaseStats(data["stats"])
 
         # moves
-        self.move_pool = MovePool(data["moves"])
+        self.move_pool: MovePool = MovePool(data["moves"])
         self.move_set: MoveSet = self.move_pool.get_default_moveset(self.level)
 
         # IVs and EVs initialization
         self.__generate_ivs()
-        self.hp_ev = 0
-        self.attack_ev = 0
-        self.defense_ev = 0
-        self.special_attack_ev = 0
-        self.special_defense_ev = 0
-        self.speed_ev = 0
+        self.hp_ev: int = 0
+        self.attack_ev: int = 0
+        self.defense_ev: int = 0
+        self.special_attack_ev: int = 0
+        self.special_defense_ev: int = 0
+        self.speed_ev: int = 0
 
         # calculate stats
         self.__update_stats()
-        self.current_hp = self.hp
-        self.fainted = False
+        self.current_hp: int = self.hp
+        self.fainted: bool = False
 
     def __generate_ivs(self):
         ivs = random.sample(range(32), 6)
@@ -255,8 +256,8 @@ class Pokemon:
         return string
 
 class PokemonParty:
-    def __init__(self, pokemons):
-        self.pokemon_party = [None] * 6
+    def __init__(self, pokemons: List[Pokemon]):
+        self.pokemon_party: List[Pokemon] = [None] * 6
 
         for i in range(len(pokemons)):
             self.pokemon_party[i] = pokemons[i]

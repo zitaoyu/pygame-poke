@@ -10,7 +10,6 @@ GAME_WINDOW_WIDTH = 640
 GAME_WINDOW_HEIGHT = 480
 GAME_NAME = "PyEmerald"
 
-
 class SoundPlayer:
 
     def __init__(self):
@@ -24,6 +23,33 @@ class SoundPlayer:
         mixer.music.load(track)
         mixer.music.play(-1)
 
+GLOBAL_SOUND_PLAYER = SoundPlayer()
+
+
+class Logger:
+    def __init__(self) -> None:
+        self.__message = []
+
+    def push(self, log):
+        self.__message.append(log)
+
+    def pop(self):
+        if len(self.__message) == 0:
+            return None
+        return self.__message.pop()
+
+    def __str__(self) -> str:
+        return self.__message.__str__()
+
+LOGGER = Logger()
+
+def LOG(log):
+    global LOGGER
+    LOGGER.push(log)
+
+def GETLOG():
+    global LOGGER
+    return LOGGER.pop()
 
 def find_lowest_pixel_in_transparent_image(image_path):
     import numpy as np

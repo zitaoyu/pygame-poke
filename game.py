@@ -20,8 +20,8 @@ class Game:
         import random
         id_1 = random.sample(range(400), 1)[0]
         id_2 = random.sample(range(400), 1)[0]
-        party_1 = PokemonParty([Pokemon(id_1, 1)])
-        party_2 = PokemonParty([Pokemon(id_2, 1)])
+        party_1 = PokemonParty([Pokemon(id_1, 50)])
+        party_2 = PokemonParty([Pokemon(id_2, 60)])
         self.battle_scene = BattleScene(self.window, BattleManager(party_1, party_2))
 
     def draw_window(self):

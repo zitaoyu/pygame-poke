@@ -37,51 +37,55 @@ class BattleManager:
         return damage
 
     def pokemon_use_move(self, move_index: int, attacker: Pokemon, defender: Pokemon):
-        level = attacker.level
         move = attacker.move_set.get_move_with_index(move_index)
         power = move.power
-        if move.damage_class == "physical":
-            attack = attacker.attack
-            defense = defender.defense
-        else:
-            attack = attacker.special_attack
-            defense = defender.special_defense
-        targets = 1
-        weather = 1
+        LOG(attacker.nickname + " used " + move.name + " to " + defender.nickname + ".")
+        LOG("Super effective!")
+        if power:
+            level = attacker.level
+            if move.damage_class == "physical":
+                attack = attacker.attack
+                defense = defender.defense
+            else:
+                attack = attacker.special_attack
+                defense = defender.special_defense
+            targets = 1
+            weather = 1
 
-        # calculate critical chance
-        critical = 1
-        roll = random.random()
-        chance = 1/24
-        if attacker is self.my_battling_pokemon:
-            critical_chance_stage = self.my_battling_pokemon_critical_chance_stage
-        else:
-            critical_chance_stage = self.opponent_battling_pokemon_critical_chance_stage
-        if critical_chance_stage == 1:
-            chance = 1/8
-        elif critical_chance_stage == 2:
-            chance = 1/2
-        elif critical_chance_stage >= 3:
-            chance = 1
-        if chance >= roll:
-            critical = 1.5
+            # calculate critical chance
+            critical = 1
+            roll = random.random()
+            chance = 1/24
+            if attacker is self.my_battling_pokemon:
+                critical_chance_stage = self.my_battling_pokemon_critical_chance_stage
+            else:
+                critical_chance_stage = self.opponent_battling_pokemon_critical_chance_stage
+            if critical_chance_stage == 1:
+                chance = 1/8
+            elif critical_chance_stage == 2:
+                chance = 1/2
+            elif critical_chance_stage >= 3:
+                chance = 1
+            if chance >= roll:
+                critical = 1.5
+                LOG("Critical hit!")
 
-        random_val = random.uniform(0.85, 1)
-        if move.type in attacker.types:
-            STAB = 1.5
-        else:
-            STAB = 1
-        type = 1
-        burn = 1
+            random_val = random.uniform(0.85, 1)
+            if move.type in attacker.types:
+                STAB = 1.5
+            else:
+                STAB = 1
+            type = 1
+            burn = 1
 
-        damange = self._calculate_damage(level, power, attack, defense, targets, weather, critical, random_val, STAB, type, burn)
-        defender.take_damage(damange)
+            damange = self._calculate_damage(level, power, attack, defense, targets, weather, critical, random_val, STAB, type, burn)
+            defender.take_damage(damange)
 
     def my_battling_pokemon_use_move(self, move_index: int):
         self.pokemon_use_move(move_index, self.my_battling_pokemon, self.opponent_battling_pokemon)
 
     def opponent_battling_pokemon_use_move(self):
-        move_index = random.randint(1, self.opponent_battling_pokemon.move_set.get_size())
+        move_index = random.randint(1, self.opponent_battling_pokemon.move_set.get_size()) - 1
         self.pokemon_use_move(move_index, self.opponent_battling_pokemon, self.my_battling_pokemon)
 
 

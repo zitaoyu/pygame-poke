@@ -27,45 +27,50 @@ RUN_COMMAND_SELECT      = CURSOR_COMMAND_IMAGE.subsurface(130, 138, 129, 45)
 
 FIGHT_MENU = pygame.transform.scale(pygame.image.load(os.path.join(PATH, "overlay_fight.png")), (GAME_WINDOW_WIDTH, 92))
 MOVE_BUTTON_IMAGE = pygame.image.load(os.path.join(PATH, "cursor_fight.png"))
-MOVE_BUTTON_GHOST           = MOVE_BUTTON_IMAGE.subsurface(0, 0, 191, 47)
-MOVE_BUTTON_GHOST_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 0, 191, 47)
-MOVE_BUTTON_FIGHTING        = MOVE_BUTTON_IMAGE.subsurface(0, 46, 191, 47)
-MOVE_BUTTON_FIGHTING_SELECT = MOVE_BUTTON_IMAGE.subsurface(192, 46, 191, 47)
-MOVE_BUTTON_WATER           = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 2, 191, 47)
-MOVE_BUTTON_WATER_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 2, 191, 47)
-MOVE_BUTTON_POISON          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 3, 191, 47)
-MOVE_BUTTON_POISON_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 3, 191, 47)
-MOVE_BUTTON_ROCK            = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 4, 191, 47)
-MOVE_BUTTON_ROCK_SELECT     = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 4, 191, 47)
-MOVE_BUTTON_GROUND          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 5, 191, 47)
-MOVE_BUTTON_GROUND_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 5, 191, 47)
-MOVE_BUTTON_BUG             = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 6, 191, 47)
-MOVE_BUTTON_BUG_SELECT      = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 6, 191, 47)
-MOVE_BUTTON_PHYCHIC         = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 7, 191, 47)
-MOVE_BUTTON_PHYCHIC_SELECT  = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 7, 191, 47)
-MOVE_BUTTON_NORMAL          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 8, 191, 47)
-MOVE_BUTTON_NORMAL_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 8, 191, 47)
-MOVE_BUTTON_STEEL           = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 9, 191, 47)
-MOVE_BUTTON_STEEL_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 9, 191, 47)
-MOVE_BUTTON_FIRE            = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 10, 191, 47)
-MOVE_BUTTON_FIRE_SELECT     = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 10, 191, 47)
-MOVE_BUTTON_FLYING          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 11, 191, 47)
-MOVE_BUTTON_FLYING_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 11, 191, 47)
-MOVE_BUTTON_GRASS           = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 12, 191, 47)
-MOVE_BUTTON_GRASS_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 12, 191, 47)
-MOVE_BUTTON_ELECTRIC        = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 13, 191, 47)
-MOVE_BUTTON_ELECTRIC_SELECT = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 13, 191, 47)
-MOVE_BUTTON_ICE             = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 14, 191, 47)
-MOVE_BUTTON_ICE_SELECT      = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 14, 191, 47)
-MOVE_BUTTON_DRAGON          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 14, 191, 47)
-MOVE_BUTTON_DRAGON_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 14, 191, 47)
-MOVE_BUTTON_DARK            = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 14, 191, 47)
-MOVE_BUTTON_DARK_SELECT     = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 14, 191, 47)
-MOVE_BUTTON_FAIRY           = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 14, 191, 47)
-MOVE_BUTTON_FAIRY_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 14, 191, 47)
+MOVE_BUTTON_GHOST           = MOVE_BUTTON_IMAGE.subsurface(0, 0, 192, 45)
+MOVE_BUTTON_GHOST_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 0, 192, 45)
+MOVE_BUTTON_FIGHTING        = MOVE_BUTTON_IMAGE.subsurface(0, 46, 192, 45)
+MOVE_BUTTON_FIGHTING_SELECT = MOVE_BUTTON_IMAGE.subsurface(192, 46, 192, 45)
+MOVE_BUTTON_WATER           = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 2, 192, 45)
+MOVE_BUTTON_WATER_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 2, 192, 45)
+MOVE_BUTTON_POISON          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 3, 192, 45)
+MOVE_BUTTON_POISON_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 3, 192, 45)
+MOVE_BUTTON_ROCK            = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 4, 192, 45)
+MOVE_BUTTON_ROCK_SELECT     = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 4, 192, 45)
+MOVE_BUTTON_GROUND          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 5, 192, 45)
+MOVE_BUTTON_GROUND_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 5, 192, 45)
+MOVE_BUTTON_BUG             = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 6, 192, 45)
+MOVE_BUTTON_BUG_SELECT      = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 6, 192, 45)
+MOVE_BUTTON_NORMAL          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 8, 192, 45)
+MOVE_BUTTON_NORMAL_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 8, 192, 45)
+MOVE_BUTTON_STEEL           = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 9, 192, 45)
+MOVE_BUTTON_STEEL_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 9, 192, 45)
+MOVE_BUTTON_FIRE            = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 10, 192, 45)
+MOVE_BUTTON_FIRE_SELECT     = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 10, 192, 45)
+MOVE_BUTTON_FLYING          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 11, 192, 45)
+MOVE_BUTTON_FLYING_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 11, 192, 45)
+MOVE_BUTTON_GRASS           = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 12, 192, 45)
+MOVE_BUTTON_GRASS_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 12, 192, 45)
+MOVE_BUTTON_ELECTRIC        = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 13, 192, 45)
+MOVE_BUTTON_ELECTRIC_SELECT = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 13, 192, 45)
+MOVE_BUTTON_PHYCHIC         = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 14, 192, 45)
+MOVE_BUTTON_PHYCHIC_SELECT  = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 14, 192, 45)
+MOVE_BUTTON_ICE             = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 15, 192, 45)
+MOVE_BUTTON_ICE_SELECT      = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 15, 192, 45)
+MOVE_BUTTON_DRAGON          = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 16, 192, 45)
+MOVE_BUTTON_DRAGON_SELECT   = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 16, 192, 45)
+MOVE_BUTTON_DARK            = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 17, 192, 45)
+MOVE_BUTTON_DARK_SELECT     = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 17, 192, 45)
+MOVE_BUTTON_FAIRY           = MOVE_BUTTON_IMAGE.subsurface(0, 46 * 18, 192, 45)
+MOVE_BUTTON_FAIRY_SELECT    = MOVE_BUTTON_IMAGE.subsurface(192, 46 * 18, 192, 45)
 
 DATABOX = pygame.image.load(os.path.join(PATH, "databox_normal.png"))
 OPPONENT_DATABOX = pygame.image.load(os.path.join(PATH, "databox_normal_foe.png"))
+LV = pygame.image.load(os.path.join(PATH, "overlay_lv.png"))
+HP = pygame.image.load(os.path.join(PATH, "overlay_hp.png"))
+HP_GREEN = HP.subsurface(0, 0, 96, 6)
+HP_YELLOW = HP.subsurface(0, 6, 96, 6)
+HP_RED = HP.subsurface(0, 12, 96, 6)
 
 # coordnates
 DIALOG_BOX_BACKGROUND_COORDINATES = (0, GAME_WINDOW_HEIGHT - 112)
@@ -87,7 +92,8 @@ MOVE_2_NAME_COORDINATES = (291, GAME_WINDOW_HEIGHT - 102)
 MOVE_3_NAME_COORDINATES = (0, GAME_WINDOW_HEIGHT - 46)
 MOVE_4_NAME_COORDINATES = (241, GAME_WINDOW_HEIGHT - 46)
 
-Font = pygame.font.Font('./assets/fonts/power green.ttf', 24)
+FONT_24 = pygame.font.Font('./assets/fonts/power green.ttf', 24)
+FONT_16 = pygame.font.Font('./assets/fonts/power green.ttf', 18)
 
 def get_move_button(type: Type, is_select: bool):
     if type == Type.GHOST:
@@ -177,6 +183,7 @@ def get_move_button(type: Type, is_select: bool):
             return MOVE_BUTTON_FAIRY
 
 class Menu(Enum):
+    MESSAGE = "message"
     MAIN = "main"
     FIGHT = "fight"
     BAG = "bag"
@@ -187,21 +194,22 @@ class BattleScene:
     def __init__(self, window: Surface, battle_manager: BattleManager):
         self.window = window
         self.battle_manager = battle_manager
+        self.my_battling_pokemon = self.battle_manager.my_battling_pokemon
+        self.opponent_battling_pokemon = self.battle_manager.opponent_battling_pokemon
         self.menu: Menu = Menu.MAIN
         self.menu_select = 0
         self.move_select = 0
         self.move_size = self.battle_manager.my_battling_pokemon.move_set.get_size()
         self.background = BACKGROUND
         self.input_cooldown = 0
-        # self._enter_battle_scene()
+        # self.__enter_battle_scene()
         self.open_scene = False
         self.__update_battling_pokemons_sprites()
-        self.sound_player = SoundPlayer()
-        self.sound_player.play_track('./sounds/battle.mp3')
+        GLOBAL_SOUND_PLAYER.play_track('./sounds/battle.mp3')
 
     def __update_battling_pokemons_sprites(self):
-        my_battling_pokemon_sprite_path = os.path.join("assets/pokemon", str(self.battle_manager.my_battling_pokemon.id) + "_back.png")
-        opponent_battling_pokemon_sprite_path = os.path.join("assets/pokemon", str(self.battle_manager.opponent_battling_pokemon.id) + "_front.png")
+        my_battling_pokemon_sprite_path = os.path.join("assets/pokemon", str(self.my_battling_pokemon.id) + "_back.png")
+        opponent_battling_pokemon_sprite_path = os.path.join("assets/pokemon", str(self.opponent_battling_pokemon.id) + "_front.png")
         surface_1 = pygame.image.load(my_battling_pokemon_sprite_path)
         surface_2 = pygame.image.load(opponent_battling_pokemon_sprite_path)
         self.my_battling_pokemon_sprite = pygame.transform.scale(surface_1, (TILE_WIDTH * 8, TILE_WIDTH * 8))
@@ -209,8 +217,6 @@ class BattleScene:
 
         offset = find_lowest_pixel_in_transparent_image(opponent_battling_pokemon_sprite_path)
         self.opponent_battling_pokemon_sprite_coordinates = (372, 220 - offset * 2)
-
-
         
     def __check_input(self):
         inputs = check_input()
@@ -273,6 +279,10 @@ class BattleScene:
                         self.move_select = 3
                 elif input == INPUT.SELECT:
                     self.battle_manager.my_battling_pokemon_use_move(self.move_select)
+                    self.__draw_all_logs()
+                    self.battle_manager.opponent_battling_pokemon_use_move()
+                    self.__draw_all_logs()
+                    self.menu = Menu.MESSAGE
                     self.input_cooldown = 10
                 elif input == INPUT.BACK:
                     self.menu = Menu.MAIN
@@ -281,7 +291,7 @@ class BattleScene:
         if old_menu != self.menu or old_select != self.menu_select or old_select_move != self.move_select:
                 self.input_cooldown = 10
 
-    def _enter_battle_scene(self):
+    def __enter_battle_scene(self):
         s = pygame.Surface((640, 60), pygame.SRCALPHA)     # per-pixel alpha
         s.fill((0, 0, 0, 192))                             # notice the alpha value in the color
         l = [0, 7, 3, 5, 1, 6, 2, 4]
@@ -293,6 +303,20 @@ class BattleScene:
         self.open_scene_box_1 = pygame.Rect(0, 0, 640, 240)
         self.open_scene_box_2 = pygame.Rect(0, 240, 640, 240)
 
+    def __draw_message(self, message):
+        text = FONT_24.render(message, False, (0, 0, 0))
+        self.window.blit(text, (DIALOG_BOX_BACKGROUND_COORDINATES[0] + 20, DIALOG_BOX_BACKGROUND_COORDINATES[1] + 40))
+
+    def __draw_all_logs(self):
+        message = GETLOG()
+        while message != None:
+            self.__draw_message(message)
+            time.sleep(0.5)
+            while True:
+                if INPUT.SELECT in check_input():
+                    break
+            message = GETLOG()
+
     def draw_entity_list(self):
         self.window.fill(WHITE)
         # background:
@@ -300,15 +324,32 @@ class BattleScene:
         # pokemon sprites:
         self.window.blit(self.my_battling_pokemon_sprite, MY_POKEMON_COORDINATES)
         self.window.blit(self.opponent_battling_pokemon_sprite, self.opponent_battling_pokemon_sprite_coordinates)
-        # data box:
+        # my pokemon data box:
         self.window.blit(DATABOX, DATABOX_COORDINATES)
+        my_pokemon_name = FONT_24.render(self.my_battling_pokemon.nickname, False, (0, 0, 0))
+        self.window.blit(my_pokemon_name, (DATABOX_COORDINATES[0] + 40, DATABOX_COORDINATES[1] + 5))
+        hp = FONT_16.render(str(self.my_battling_pokemon.current_hp) + " / " + str(self.my_battling_pokemon.hp), False, (0, 0, 0))
+        self.window.blit(hp, (DATABOX_COORDINATES[0] + 160, DATABOX_COORDINATES[1] + 47))
+        self.window.blit(LV, (DATABOX_COORDINATES[0] + 180, DATABOX_COORDINATES[1] + 17))
+        lv = FONT_24.render(str(self.my_battling_pokemon.level), False, (0, 0, 0))
+        self.window.blit(lv, (DATABOX_COORDINATES[0] + 205, DATABOX_COORDINATES[1] + 4))
+        self.window.blit(get_hp_bar(self.my_battling_pokemon.current_hp, self.my_battling_pokemon.hp), (DATABOX_COORDINATES[0] + 136, DATABOX_COORDINATES[1] + 40))
+        # opponent data box:
         self.window.blit(OPPONENT_DATABOX, OPPONENT_DATABOX_COORDINATES)
+        opponent_pokemon_name = FONT_24.render(self.opponent_battling_pokemon.nickname, False, (0, 0, 0))
+        self.window.blit(opponent_pokemon_name, (OPPONENT_DATABOX_COORDINATES[0] + 10, OPPONENT_DATABOX_COORDINATES[1] + 5))
+        self.window.blit(LV, (OPPONENT_DATABOX_COORDINATES[0] + 165, OPPONENT_DATABOX_COORDINATES[1] + 17))
+        lv = FONT_24.render(str(self.opponent_battling_pokemon.level), False, (0, 0, 0))
+        self.window.blit(lv, (OPPONENT_DATABOX_COORDINATES[0] + 190, OPPONENT_DATABOX_COORDINATES[1] + 4))
+        self.window.blit(get_hp_bar(self.opponent_battling_pokemon.current_hp, self.opponent_battling_pokemon.hp), (OPPONENT_DATABOX_COORDINATES[0] + 118, OPPONENT_DATABOX_COORDINATES[1] + 40))
+
         # menu:
         self.window.blit(DIALOG_BOX_BACKGROUND, DIALOG_BOX_BACKGROUND_COORDINATES)
         self.input_cooldown -= 1
         if self.input_cooldown < 0:
             self.__check_input()
         if self.menu == Menu.MAIN:
+            # main menu:
             self.window.blit(DIALOG_BOX_MAIN_MENU, DIALOG_BOX_COORDINATES)
             self.window.blit(FIGHT_COMMAND, FIGHT_COMMAND_COORDINATES)
             self.window.blit(BAG_COMMAND, BAG_COMMAND_COORDINATES)
@@ -322,14 +363,16 @@ class BattleScene:
                 self.window.blit(POKEMON_COMMAND_SELECT, POKEMON_COMMAND_COORDINATES)
             elif self.menu_select == 3:
                 self.window.blit(RUN_COMMAND_SELECT, RUN_COMMAND_COORDINATES)
+            self.__draw_message("What will " + self.my_battling_pokemon.nickname + " do?")
         elif self.menu == Menu.FIGHT:
+            # fight menu:
             self.window.blit(FIGHT_MENU, DIALOG_BOX_COORDINATES)
-
-            move_set = self.battle_manager.my_battling_pokemon.move_set
+            # move buttons:
+            move_set = self.my_battling_pokemon.move_set
             for i in range(4):
                 move = move_set.get_move_with_index(i)
                 if move != None:
-                    name = Font.render(move.name, False, (0, 0, 0))
+                    name = FONT_24.render(move.name, False, (0, 0, 0))
                     coordinates = MOVE_1_COORDINATES
                     move_button = get_move_button(move.type, i == self.move_select)
                     MOVE_BUTTON_GHOST
@@ -341,6 +384,8 @@ class BattleScene:
                         coordinates = MOVE_4_COORDINATES
                     self.window.blit(pygame.transform.scale(move_button, (241, 46)), coordinates)
                     self.window.blit(name, (int(coordinates[0]) + 40, int(coordinates[1]) + 5))
+        elif self.menu == Menu.MESSAGE:
+            pass
         elif self.menu == Menu.BAG:
             pass
 
@@ -359,3 +404,13 @@ def draw_pokemon_sprite_bounding_box():
     # opponent_pokemon_box.fill((0, 0, 0, 192))
     # self.window.blit(opponent_pokemon_box, MY_POKEMON_COORDINATES)
     pass
+
+def get_hp_bar(current_hp, hp):
+    perc = current_hp / hp
+    if perc <= 0.2:
+        bar = HP_RED
+    elif perc <= 0.5:
+        bar = HP_YELLOW
+    else:
+        bar = HP_GREEN
+    return pygame.transform.scale(bar, (int(bar.get_width() * perc), 6))

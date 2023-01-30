@@ -8,7 +8,6 @@ class OpenWorld:
     def __init__(self, window: Surface, player: Player):
         self.window = window
         self.player = player
-        self.sound_player = SoundPlayer()
         self.entity_list = []
         self.load_map(player_start_x=15 * TILE_WIDTH, player_start_y=11 * TILE_WIDTH)
 
@@ -20,7 +19,7 @@ class OpenWorld:
         object = json.load(open("./Maps/map.json"))["testMap"]
         map = object["map"]
         background_music = object["backgroundMusic"]
-        self.sound_player.play_track(background_music)
+        GLOBAL_SOUND_PLAYER.play_track(background_music)
         camera_offest_x = -(player_start_x - CAMREA_CENTER_X)
         camera_offest_y = -(player_start_y - CAMREA_CENTER_Y)
 
