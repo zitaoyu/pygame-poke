@@ -283,13 +283,13 @@ class BattleScene:
                 elif input == INPUT.SELECT:
                     self.menu = Menu.BATTLE
                     self.battle_animation_stage = 0
-                    self.input_cooldown = 10
+                    self.battle_animation_cooldown = FPS * 2
                 elif input == INPUT.BACK:
                     self.menu = Menu.MAIN
-                    self.input_cooldown = 10
+                    self.input_cooldown = FPS / 2
         
         if old_menu != self.menu or old_select != self.menu_select or old_select_move != self.move_select:
-                self.input_cooldown = 10
+                self.input_cooldown = FPS / 2
 
     def __enter_battle_scene(self):
         s = pygame.Surface((640, 60), pygame.SRCALPHA)     # per-pixel alpha
@@ -392,14 +392,33 @@ class BattleScene:
                     self.window.blit(pygame.transform.scale(move_button, (241, 46)), coordinates)
                     self.window.blit(name, (int(coordinates[0]) + 40, int(coordinates[1]) + 5))
         elif self.menu == Menu.BATTLE:
-            if self.battle_animation_cooldown <= 0:
-                if self.battle_animation_stage == 0:
-                    self.__draw_message(my_pokemon_nickname + " used " + self.my_battling_pokemon.move_set.get_move_with_index(self.move_select).name + "!")
+            if self.battle_animation_stage == 0:
+                self.__draw_message(my_pokemon_nickname + " used " + self.my_battling_pokemon.move_set.get_move_with_index(self.move_select).name + "!")
+                if self.battle_animation_cooldown == 0:
                     self.battle_animation_stage += 1
-                    self.battle_animation_cooldown = 30
-                elif self.battle_animation_stage == 1:
-                    self.battle_manager.my_battling_pokemon_use_move(self.move_select)
-
+                    self.battle_animation_cooldown = FPS * 2
+            elif self.battle_animation_stage == 1:
+                self.battle_manager.my_battling_pokemon_use_move(self.move_select)
+                self.battle_animation_stage += 1
+            elif self.battle_animation_stage == 2:
+                if self.battle_manager.messages[0]:
+                    self.__draw_message(self.battle_manager.messages[0])
+                else:
+                    self.battle_animation_stage += 1
+                    self.battle_animation_cooldown = FPS * 2
+                if self.battle_animation_cooldown == 0:
+                    self.battle_animation_stage += 1
+                    self.battle_animation_cooldown = FPS * 2
+            elif self.battle_animation_stage == 3:
+                if self.battle_manager.messages[1]:
+                    self.__draw_message(self.battle_manager.messages[1])
+                else:
+                    self.battle_animation_stage += 1
+                    self.battle_animation_cooldown = FPS * 2
+                if self.battle_animation_cooldown == 0:
+                    self.battle_animation_stage += 1
+                    self.battle_animation_cooldown = FPS * 2
+            elif self.battle_animation_stage == 4:
                 self.battle_manager.opponent_battling_pokemon_use_move()
             self.battle_animation_cooldown -= 1
         elif self.menu == Menu.BAG:

@@ -24,6 +24,8 @@ class BattleManager:
         self.weather = None
         self.terrain = None
 
+        self.messages = []
+
     def _calculate_damage(self, level, power, attack, defense, targets, weather, critical, random, STAB, type, burn) -> int:
         # 
         # Damange formula: Gen V onward from https://bulbapedia.bulbagarden.net/wiki/Damage
@@ -53,7 +55,9 @@ class BattleManager:
 
             # calculate type
             type = 1
-            if type == 2:
+            if type == 0.5:
+                messages.append("Not very effective!")
+            elif type == 2:
                 messages.append("Super effective!")
 
             # calculate critical chance
@@ -83,7 +87,7 @@ class BattleManager:
 
             damange = self._calculate_damage(level, power, attack, defense, targets, weather, critical, random_val, STAB, type, burn)
             defender.take_damage(damange)
-            return messages
+            self.messages =  messages
 
     def my_battling_pokemon_use_move(self, move_index: int):
         self.pokemon_use_move(move_index, self.my_battling_pokemon, self.opponent_battling_pokemon)
