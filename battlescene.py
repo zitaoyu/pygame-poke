@@ -183,11 +183,11 @@ def get_move_button(type: Type, is_select: bool):
             return MOVE_BUTTON_FAIRY
 
 class Menu(Enum):
-    MESSAGE = "message"
     MAIN = "main"
     FIGHT = "fight"
     BAG = "bag"
     POKEMON = "pokemon"
+    BATTLE = "battle"
 
 class BattleScene:
 
@@ -204,8 +204,11 @@ class BattleScene:
         self.input_cooldown = 0
         # self.__enter_battle_scene()
         self.open_scene = False
+        self.battle_animation_stage = 0
+        self.battle_animation_cooldown = 0
+        self.messages = []
         self.__update_battling_pokemons_sprites()
-        GLOBAL_SOUND_PLAYER.play_track('./sounds/battle.mp3')
+        GLOBAL_SOUND_PLAYER.play_track('./sounds/battle_2.mp3')
 
     def __update_battling_pokemons_sprites(self):
         my_battling_pokemon_sprite_path = os.path.join("assets/pokemon", str(self.my_battling_pokemon.id) + "_back.png")
@@ -278,11 +281,8 @@ class BattleScene:
                     elif self.move_select == 1 and self.move_size == 4:
                         self.move_select = 3
                 elif input == INPUT.SELECT:
-                    self.battle_manager.my_battling_pokemon_use_move(self.move_select)
-                    self.__draw_all_logs()
-                    self.battle_manager.opponent_battling_pokemon_use_move()
-                    self.__draw_all_logs()
-                    self.menu = Menu.MESSAGE
+                    self.menu = Menu.BATTLE
+                    self.battle_animation_stage = 0
                     self.input_cooldown = 10
                 elif input == INPUT.BACK:
                     self.menu = Menu.MAIN
@@ -303,10 +303,16 @@ class BattleScene:
         self.open_scene_box_1 = pygame.Rect(0, 0, 640, 240)
         self.open_scene_box_2 = pygame.Rect(0, 240, 640, 240)
 
+    def __draw_next_message(self):
+        if len(self.messages) == 0:
+            return
+        text = FONT_24.render(self.messages.pop(), False, (0, 0, 0))
+        self.window.blit(text, (DIALOG_BOX_BACKGROUND_COORDINATES[0] + 20, DIALOG_BOX_BACKGROUND_COORDINATES[1] + 40))
+
     def __draw_message(self, message):
         text = FONT_24.render(message, False, (0, 0, 0))
         self.window.blit(text, (DIALOG_BOX_BACKGROUND_COORDINATES[0] + 20, DIALOG_BOX_BACKGROUND_COORDINATES[1] + 40))
-
+        
     def __draw_all_logs(self):
         message = GETLOG()
         while message != None:
@@ -326,8 +332,9 @@ class BattleScene:
         self.window.blit(self.opponent_battling_pokemon_sprite, self.opponent_battling_pokemon_sprite_coordinates)
         # my pokemon data box:
         self.window.blit(DATABOX, DATABOX_COORDINATES)
-        my_pokemon_name = FONT_24.render(self.my_battling_pokemon.nickname, False, (0, 0, 0))
-        self.window.blit(my_pokemon_name, (DATABOX_COORDINATES[0] + 40, DATABOX_COORDINATES[1] + 5))
+        my_pokemon_nickname = self.my_battling_pokemon.nickname
+        name = FONT_24.render(my_pokemon_nickname, False, (0, 0, 0))
+        self.window.blit(name, (DATABOX_COORDINATES[0] + 40, DATABOX_COORDINATES[1] + 5))
         hp = FONT_16.render(str(self.my_battling_pokemon.current_hp) + " / " + str(self.my_battling_pokemon.hp), False, (0, 0, 0))
         self.window.blit(hp, (DATABOX_COORDINATES[0] + 160, DATABOX_COORDINATES[1] + 47))
         self.window.blit(LV, (DATABOX_COORDINATES[0] + 180, DATABOX_COORDINATES[1] + 17))
@@ -336,8 +343,8 @@ class BattleScene:
         self.window.blit(get_hp_bar(self.my_battling_pokemon.current_hp, self.my_battling_pokemon.hp), (DATABOX_COORDINATES[0] + 136, DATABOX_COORDINATES[1] + 40))
         # opponent data box:
         self.window.blit(OPPONENT_DATABOX, OPPONENT_DATABOX_COORDINATES)
-        opponent_pokemon_name = FONT_24.render(self.opponent_battling_pokemon.nickname, False, (0, 0, 0))
-        self.window.blit(opponent_pokemon_name, (OPPONENT_DATABOX_COORDINATES[0] + 10, OPPONENT_DATABOX_COORDINATES[1] + 5))
+        name = FONT_24.render(self.opponent_battling_pokemon.nickname, False, (0, 0, 0))
+        self.window.blit(name, (OPPONENT_DATABOX_COORDINATES[0] + 10, OPPONENT_DATABOX_COORDINATES[1] + 5))
         self.window.blit(LV, (OPPONENT_DATABOX_COORDINATES[0] + 165, OPPONENT_DATABOX_COORDINATES[1] + 17))
         lv = FONT_24.render(str(self.opponent_battling_pokemon.level), False, (0, 0, 0))
         self.window.blit(lv, (OPPONENT_DATABOX_COORDINATES[0] + 190, OPPONENT_DATABOX_COORDINATES[1] + 4))
@@ -363,7 +370,7 @@ class BattleScene:
                 self.window.blit(POKEMON_COMMAND_SELECT, POKEMON_COMMAND_COORDINATES)
             elif self.menu_select == 3:
                 self.window.blit(RUN_COMMAND_SELECT, RUN_COMMAND_COORDINATES)
-            self.__draw_message("What will " + self.my_battling_pokemon.nickname + " do?")
+            self.__draw_message("What will " + my_pokemon_nickname + " do?")
         elif self.menu == Menu.FIGHT:
             # fight menu:
             self.window.blit(FIGHT_MENU, DIALOG_BOX_COORDINATES)
@@ -384,8 +391,17 @@ class BattleScene:
                         coordinates = MOVE_4_COORDINATES
                     self.window.blit(pygame.transform.scale(move_button, (241, 46)), coordinates)
                     self.window.blit(name, (int(coordinates[0]) + 40, int(coordinates[1]) + 5))
-        elif self.menu == Menu.MESSAGE:
-            pass
+        elif self.menu == Menu.BATTLE:
+            if self.battle_animation_cooldown <= 0:
+                if self.battle_animation_stage == 0:
+                    self.__draw_message(my_pokemon_nickname + " used " + self.my_battling_pokemon.move_set.get_move_with_index(self.move_select).name + "!")
+                    self.battle_animation_stage += 1
+                    self.battle_animation_cooldown = 30
+                elif self.battle_animation_stage == 1:
+                    self.battle_manager.my_battling_pokemon_use_move(self.move_select)
+
+                self.battle_manager.opponent_battling_pokemon_use_move()
+            self.battle_animation_cooldown -= 1
         elif self.menu == Menu.BAG:
             pass
 

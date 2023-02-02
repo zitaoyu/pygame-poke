@@ -37,10 +37,9 @@ class BattleManager:
         return damage
 
     def pokemon_use_move(self, move_index: int, attacker: Pokemon, defender: Pokemon):
+        messages = []
         move = attacker.move_set.get_move_with_index(move_index)
         power = move.power
-        LOG(attacker.nickname + " used " + move.name + " to " + defender.nickname + ".")
-        LOG("Super effective!")
         if power:
             level = attacker.level
             if move.damage_class == "physical":
@@ -51,6 +50,11 @@ class BattleManager:
                 defense = defender.special_defense
             targets = 1
             weather = 1
+
+            # calculate type
+            type = 1
+            if type == 2:
+                messages.append("Super effective!")
 
             # calculate critical chance
             critical = 1
@@ -68,18 +72,18 @@ class BattleManager:
                 chance = 1
             if chance >= roll:
                 critical = 1.5
-                LOG("Critical hit!")
+                messages.append("Critical hit!")
 
             random_val = random.uniform(0.85, 1)
             if move.type in attacker.types:
                 STAB = 1.5
             else:
                 STAB = 1
-            type = 1
             burn = 1
 
             damange = self._calculate_damage(level, power, attack, defense, targets, weather, critical, random_val, STAB, type, burn)
             defender.take_damage(damange)
+            return messages
 
     def my_battling_pokemon_use_move(self, move_index: int):
         self.pokemon_use_move(move_index, self.my_battling_pokemon, self.opponent_battling_pokemon)
