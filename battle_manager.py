@@ -39,7 +39,7 @@ class BattleManager:
         return damage
 
     def pokemon_use_move(self, move_index: int, attacker: Pokemon, defender: Pokemon):
-        messages = []
+        self.messages.append(attacker.nickname + " used " + attacker.move_set.get_move_with_index(move_index).name + "!")
         move = attacker.move_set.get_move_with_index(move_index)
         power = move.power
         if power:
@@ -56,9 +56,9 @@ class BattleManager:
             # calculate type
             type = 1
             if type == 0.5:
-                messages.append("Not very effective!")
+                self.messages.append("Not very effective!")
             elif type == 2:
-                messages.append("Super effective!")
+                self.messages.append("Super effective!")
 
             # calculate critical chance
             critical = 1
@@ -76,7 +76,7 @@ class BattleManager:
                 chance = 1
             if chance >= roll:
                 critical = 1.5
-                messages.append("Critical hit!")
+                self.messages.append("Critical hit!")
 
             random_val = random.uniform(0.85, 1)
             if move.type in attacker.types:
@@ -87,7 +87,33 @@ class BattleManager:
 
             damange = self._calculate_damage(level, power, attack, defense, targets, weather, critical, random_val, STAB, type, burn)
             defender.take_damage(damange)
-            self.messages =  messages
+            if defender.fainted:
+                self.messages.append(defender.nickname + " has fainted.")
+
+    def battle(self, move_index):
+        if self.my_battling_pokemon.speed > self.opponent_battling_pokemon.speed:
+            self.pokemon_use_move(move_index, self.my_battling_pokemon, self.opponent_battling_pokemon)
+            if self.opponent_battling_pokemon.fainted:
+                return
+            self.opponent_battling_pokemon_use_move()
+        elif self.my_battling_pokemon.speed < self.opponent_battling_pokemon.speed:
+            self.opponent_battling_pokemon_use_move()
+            if self.my_battling_pokemon.fainted:
+                return
+            self.pokemon_use_move(move_index, self.my_battling_pokemon, self.opponent_battling_pokemon)
+        # speed tie
+        elif self.my_battling_pokemon.speed == self.opponent_battling_pokemon.speed:
+            random_float = random.random()
+            if random_float > 0.50:
+                self.pokemon_use_move(move_index, self.my_battling_pokemon, self.opponent_battling_pokemon)
+                if self.opponent_battling_pokemon.fainted:
+                    return
+                self.opponent_battling_pokemon_use_move()
+            else:
+                self.opponent_battling_pokemon_use_move()
+                if self.my_battling_pokemon.fainted:
+                    return
+                self.pokemon_use_move(move_index, self.my_battling_pokemon, self.opponent_battling_pokemon)
 
     def my_battling_pokemon_use_move(self, move_index: int):
         self.pokemon_use_move(move_index, self.my_battling_pokemon, self.opponent_battling_pokemon)
@@ -95,6 +121,11 @@ class BattleManager:
     def opponent_battling_pokemon_use_move(self):
         move_index = random.randint(1, self.opponent_battling_pokemon.move_set.get_size()) - 1
         self.pokemon_use_move(move_index, self.opponent_battling_pokemon, self.my_battling_pokemon)
+
+    def get_next_message(self):
+        if len(self.messages) == 0:
+            return None
+        return self.messages.pop(0)
 
 
     

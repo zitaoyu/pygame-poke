@@ -88,3 +88,9 @@ def check_input():
     elif keys_pressed[pygame.K_k]:
         inputs.append(INPUT.BACK)
     return inputs
+
+a = []
+a.append("1")
+a.append("2")
+a.append("3")
+print(a.pop(0))

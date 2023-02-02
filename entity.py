@@ -2,6 +2,7 @@ import os
 
 from animation import *
 from utilities import *
+from pokemon import *
 
 # show red bounding box toggle
 DEBUG = 0
@@ -34,6 +35,7 @@ class Entity:
         self.width = width * TILE_WIDTH
         self.height = height * TILE_WIDTH
 
+        self.type = entity_surface_type
         sprite_list = entity_surface_type.value
         for i in range(len(sprite_list)):
             sprite_list[i] = pygame.transform.scale(sprite_list[i], (self.width, self.height))
@@ -78,6 +80,9 @@ class Player():
         self._bottom_bounding_box = pygame.Rect(self.x, self.y + TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
         self._left_bounding_box = pygame.Rect(self.x - TILE_WIDTH, self.y, TILE_WIDTH, TILE_WIDTH)
         self._right_bounding_box = pygame.Rect(self.x + TILE_WIDTH, self.y, TILE_WIDTH, TILE_WIDTH)
+
+        self.party: PokemonParty = PokemonParty([Pokemon(1, 5)])
+        self.encouter = False
         
     def draw(self, window):
         window.blit(self.surface, (self.x, self.y - TILE_WIDTH // 2))
@@ -86,6 +91,8 @@ class Player():
 
     def update(self, entity_list):
         # check control
+        # TODO: move collision check to openworld
+        # TODO: implement universal input controller instead of saperate input check for battlescene and player
         if self.camera_x == self.next_camera_x and self.camera_y == self.next_camera_y:
             keys_pressed = pygame.key.get_pressed()
             if keys_pressed[pygame.K_a]:
@@ -96,6 +103,8 @@ class Player():
                 self.surface = self._right_surface
                 if not is_bb_collide_with_entity_list(self._right_bounding_box, entity_list):
                     self.next_camera_x =  self.camera_x - TILE_WIDTH
+                else:
+                    self.encouter = True
             elif keys_pressed[pygame.K_w]:
                 self.surface = self._back_surface
                 if not is_bb_collide_with_entity_list(self._top_bounding_box, entity_list):

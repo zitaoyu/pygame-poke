@@ -11,22 +11,10 @@ class Game:
         self.window = pygame.display.set_mode((GAME_WINDOW_WIDTH, GAME_WINDOW_HEIGHT))
         pygame.display.set_caption(GAME_NAME)
         self.player = Player()
-        # self.open_world = OpenWorld(self.window, self.player)
-
-
-        # 
-        # Test
-        # 
-        import random
-        id_1 = random.sample(range(400), 1)[0]
-        id_2 = random.sample(range(400), 1)[0]
-        party_1 = PokemonParty([Pokemon(id_1, 50)])
-        party_2 = PokemonParty([Pokemon(id_2, 60)])
-        self.battle_scene = BattleScene(self.window, BattleManager(party_1, party_2))
+        self.open_world = OpenWorld(self.window, self.player)
 
     def draw_window(self):
-        # self.open_world.draw_entity_list()
-        self.battle_scene.draw_entity_list()
+        self.open_world.draw_entity_list()
         pygame.display.update()
 
     def run(self):

@@ -202,13 +202,16 @@ class BattleScene:
         self.move_size = self.battle_manager.my_battling_pokemon.move_set.get_size()
         self.background = BACKGROUND
         self.input_cooldown = 0
-        # self.__enter_battle_scene()
-        self.open_scene = False
+
+        GLOBAL_SOUND_PLAYER.play_track('./sounds/battle_2.mp3')
+        self.open_scene = True
+        self.__enter_battle_scene()
+
         self.battle_animation_stage = 0
         self.battle_animation_cooldown = 0
-        self.messages = []
+        self.message = None
+        self.is_ended = False
         self.__update_battling_pokemons_sprites()
-        GLOBAL_SOUND_PLAYER.play_track('./sounds/battle_2.mp3')
 
     def __update_battling_pokemons_sprites(self):
         my_battling_pokemon_sprite_path = os.path.join("assets/pokemon", str(self.my_battling_pokemon.id) + "_back.png")
@@ -235,26 +238,25 @@ class BattleScene:
                             self.move_select = 0
                         elif input == INPUT.RIGHT:
                             self.menu_select = 1
-                        elif input == INPUT.DOWN and self.move_size >= 3:
+                        elif input == INPUT.DOWN:
                             self.menu_select = 2
                     elif self.menu_select == 1:
                         if input == INPUT.SELECT:
                             self.menu = Menu.BAG
                         elif input == INPUT.LEFT:
                             self.menu_select = 0
-                        elif input == INPUT.DOWN and self.move_size == 4:
+                        elif input == INPUT.DOWN:
                             self.menu_select = 3
                     elif self.menu_select == 2:
                         if input == INPUT.SELECT:
                             self.menu = Menu.POKEMON
-                        elif input == INPUT.RIGHT and self.move_size == 4:
+                        elif input == INPUT.RIGHT:
                             self.menu_select = 3
                         elif input == INPUT.UP:
                             self.menu_select = 0
                     elif self.menu_select == 3:
                         if input == INPUT.SELECT:
-                            # run
-                            pass
+                            self.is_ended = True
                         elif input == INPUT.LEFT:
                             self.menu_select = 2
                         elif input == INPUT.UP:
@@ -286,10 +288,10 @@ class BattleScene:
                     self.battle_animation_cooldown = FPS * 2
                 elif input == INPUT.BACK:
                     self.menu = Menu.MAIN
-                    self.input_cooldown = FPS / 2
+                    self.input_cooldown = 10
         
         if old_menu != self.menu or old_select != self.menu_select or old_select_move != self.move_select:
-                self.input_cooldown = FPS / 2
+                self.input_cooldown = 10
 
     def __enter_battle_scene(self):
         s = pygame.Surface((640, 60), pygame.SRCALPHA)     # per-pixel alpha
@@ -303,25 +305,9 @@ class BattleScene:
         self.open_scene_box_1 = pygame.Rect(0, 0, 640, 240)
         self.open_scene_box_2 = pygame.Rect(0, 240, 640, 240)
 
-    def __draw_next_message(self):
-        if len(self.messages) == 0:
-            return
-        text = FONT_24.render(self.messages.pop(), False, (0, 0, 0))
+    def __draw_message(self):
+        text = FONT_24.render(self.message, False, (0, 0, 0))
         self.window.blit(text, (DIALOG_BOX_BACKGROUND_COORDINATES[0] + 20, DIALOG_BOX_BACKGROUND_COORDINATES[1] + 40))
-
-    def __draw_message(self, message):
-        text = FONT_24.render(message, False, (0, 0, 0))
-        self.window.blit(text, (DIALOG_BOX_BACKGROUND_COORDINATES[0] + 20, DIALOG_BOX_BACKGROUND_COORDINATES[1] + 40))
-        
-    def __draw_all_logs(self):
-        message = GETLOG()
-        while message != None:
-            self.__draw_message(message)
-            time.sleep(0.5)
-            while True:
-                if INPUT.SELECT in check_input():
-                    break
-            message = GETLOG()
 
     def draw_entity_list(self):
         self.window.fill(WHITE)
@@ -370,7 +356,8 @@ class BattleScene:
                 self.window.blit(POKEMON_COMMAND_SELECT, POKEMON_COMMAND_COORDINATES)
             elif self.menu_select == 3:
                 self.window.blit(RUN_COMMAND_SELECT, RUN_COMMAND_COORDINATES)
-            self.__draw_message("What will " + my_pokemon_nickname + " do?")
+            self.message = "What will " + my_pokemon_nickname + " do?"
+            self.__draw_message()
         elif self.menu == Menu.FIGHT:
             # fight menu:
             self.window.blit(FIGHT_MENU, DIALOG_BOX_COORDINATES)
@@ -392,38 +379,32 @@ class BattleScene:
                     self.window.blit(pygame.transform.scale(move_button, (241, 46)), coordinates)
                     self.window.blit(name, (int(coordinates[0]) + 40, int(coordinates[1]) + 5))
         elif self.menu == Menu.BATTLE:
+            # TODO: hp bar animation
+            # TODO: battle animation
             if self.battle_animation_stage == 0:
-                self.__draw_message(my_pokemon_nickname + " used " + self.my_battling_pokemon.move_set.get_move_with_index(self.move_select).name + "!")
-                if self.battle_animation_cooldown == 0:
-                    self.battle_animation_stage += 1
-                    self.battle_animation_cooldown = FPS * 2
-            elif self.battle_animation_stage == 1:
-                self.battle_manager.my_battling_pokemon_use_move(self.move_select)
+                self.battle_manager.battle(self.move_select)
+                self.message = self.battle_manager.get_next_message()
                 self.battle_animation_stage += 1
+                self.battle_animation_cooldown = FPS * 2
+            elif self.battle_animation_stage == 1:
+                if self.message:
+                    if self.battle_animation_cooldown == 0:
+                        self.message = self.battle_manager.get_next_message()
+                        if self.message:
+                            self.battle_animation_cooldown = FPS * 2
+                    self.__draw_message()
+                else:
+                    # battle ended
+                    if self.my_battling_pokemon.fainted or self.opponent_battling_pokemon.fainted:
+                        self.is_ended = True
+                        return
+                    self.battle_animation_stage += 1
+                    self.battle_animation_cooldown = FPS * 2
             elif self.battle_animation_stage == 2:
-                if self.battle_manager.messages[0]:
-                    self.__draw_message(self.battle_manager.messages[0])
-                else:
-                    self.battle_animation_stage += 1
-                    self.battle_animation_cooldown = FPS * 2
-                if self.battle_animation_cooldown == 0:
-                    self.battle_animation_stage += 1
-                    self.battle_animation_cooldown = FPS * 2
-            elif self.battle_animation_stage == 3:
-                if self.battle_manager.messages[1]:
-                    self.__draw_message(self.battle_manager.messages[1])
-                else:
-                    self.battle_animation_stage += 1
-                    self.battle_animation_cooldown = FPS * 2
-                if self.battle_animation_cooldown == 0:
-                    self.battle_animation_stage += 1
-                    self.battle_animation_cooldown = FPS * 2
-            elif self.battle_animation_stage == 4:
-                self.battle_manager.opponent_battling_pokemon_use_move()
+                self.menu = Menu.MAIN
             self.battle_animation_cooldown -= 1
         elif self.menu == Menu.BAG:
             pass
-
         # entering battle scene
         if self.open_scene:
             self.open_scene_box_1.move_ip(0, -1)

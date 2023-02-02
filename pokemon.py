@@ -264,3 +264,12 @@ class PokemonParty:
 
     def get_leading_pokemon(self) -> Pokemon:
         return self.pokemon_party[0]
+
+    def add_to_party(self, pokemon: Pokemon):
+        is_added = False
+        for i in range(len(self.pokemon_party)):
+            if self.pokemon_party[i] == None:
+                self.pokemon_party[i] = pokemon
+                is_added = True
+        return is_added
+                

@@ -2,6 +2,7 @@ import json
 
 from entity import *
 from utilities import *
+from battlescene import *
 
 
 class OpenWorld:
@@ -10,6 +11,7 @@ class OpenWorld:
         self.player = player
         self.entity_list = []
         self.load_map(player_start_x=15 * TILE_WIDTH, player_start_y=11 * TILE_WIDTH)
+        self.battle_scene: BattleScene = None
 
     def __add_entity(self, entity):
         self.entity_list.append(entity)
@@ -18,8 +20,8 @@ class OpenWorld:
         self.entity_list = []
         object = json.load(open("./Maps/map.json"))["testMap"]
         map = object["map"]
-        background_music = object["backgroundMusic"]
-        GLOBAL_SOUND_PLAYER.play_track(background_music)
+        self.background_music = object["backgroundMusic"]
+        GLOBAL_SOUND_PLAYER.play_track(self.background_music)
         camera_offest_x = -(player_start_x - CAMREA_CENTER_X)
         camera_offest_y = -(player_start_y - CAMREA_CENTER_Y)
 
@@ -53,8 +55,19 @@ class OpenWorld:
             y += TILE_WIDTH
 
     def draw_entity_list(self):
+        # TODO: better logic to switch between openworld and battlescene
+        if self.player.encouter:
+            self.battle_scene = BattleScene(self.window, BattleManager(self.player.party, PokemonParty([Pokemon(4, 5)])))
+            self.player.encouter = False
         self.window.fill(WHITE)
-        self.player.update(self.entity_list)
-        for entity in self.entity_list:
-            entity.draw(self.window)
-        self.player.draw(self.window)
+        if self.battle_scene:
+            if self.battle_scene.is_ended:
+                self.battle_scene = None
+                GLOBAL_SOUND_PLAYER.play_track(self.background_music)
+                return
+            self.battle_scene.draw_entity_list()
+        else:
+            self.player.update(self.entity_list)
+            for entity in self.entity_list:
+                entity.draw(self.window)
+            self.player.draw(self.window)
