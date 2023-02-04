@@ -54,6 +54,71 @@ class OpenWorld:
                 x += TILE_WIDTH
             y += TILE_WIDTH
 
+    def __move_entity_list(self, move_x, move_y):
+        for entity in self.entity_list:
+            entity.x += move_x
+            entity.y += move_y
+            if isinstance(entity, SolidEntity):
+                entity.bounding_box.move_ip(move_x, move_y)
+
+    def __is_bb_collide_with_entity_list(self, bb):
+        for entity in self.entity_list:
+            if isinstance(entity, SolidEntity) and bb.colliderect(entity.bounding_box):
+                return True
+        return False
+
+    def update_player(self):
+        # check control
+        # TODO: move collision check to openworld
+        # TODO: implement universal input controller instead of saperate input check for battlescene and player
+
+        player = self.player
+        camera_x = player.camera_x
+        camera_y = player.camera_y
+        next_camera_x = player.next_camera_x
+        next_camera_y = player.next_camera_y
+        if camera_x == next_camera_x and camera_y == next_camera_y:
+            keys_pressed = pygame.key.get_pressed()
+            if keys_pressed[pygame.K_a]:
+                player.surface = player.left_surface
+                if not self.__is_bb_collide_with_entity_list(player.left_bounding_box):
+                    next_camera_x =  camera_x + TILE_WIDTH
+            elif keys_pressed[pygame.K_d]:
+                player.surface = player.right_surface
+                if not self.__is_bb_collide_with_entity_list(player.right_bounding_box):
+                    next_camera_x =  camera_x - TILE_WIDTH
+                else:
+                    player.encouter = True
+            elif keys_pressed[pygame.K_w]:
+                player.surface = player.back_surface
+                if not self.__is_bb_collide_with_entity_list(player.top_bounding_box):
+                    next_camera_y = camera_y + TILE_WIDTH
+            elif keys_pressed[pygame.K_s]:
+                player.surface = player.front_surface
+                if not self.__is_bb_collide_with_entity_list(player.bottom_bounding_box):
+                    next_camera_y = camera_y - TILE_WIDTH
+            if keys_pressed[pygame.K_k]:
+                player.running = True
+            else:
+                player.running = False
+        
+        #  update position
+        if not (camera_x == next_camera_x and camera_y == next_camera_y):
+            velocity = 4 if player.running else 2
+            move_x = move_y = 0
+            if camera_x < next_camera_x:
+                move_x = velocity
+            elif camera_x > next_camera_x:
+                move_x = -velocity
+            if camera_y < next_camera_y:
+                move_y = velocity
+            elif camera_y > next_camera_y:
+                move_y = -velocity
+
+            player.camera_x += move_x
+            player.camera_y += move_y
+            self.__move_entity_list(move_x, move_y)
+
     def draw_entity_list(self):
         # TODO: better logic to switch between openworld and battlescene
         if self.player.encouter:
@@ -67,7 +132,7 @@ class OpenWorld:
                 return
             self.battle_scene.draw_entity_list()
         else:
-            self.player.update(self.entity_list)
+            self.update_player()
             for entity in self.entity_list:
                 entity.draw(self.window)
             self.player.draw(self.window)

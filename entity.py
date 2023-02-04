@@ -68,18 +68,18 @@ class Player():
         self.next_camera_y = 0
 
         # sprites
-        self._front_surface = pygame.transform.scale(PLAYER_FRONT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
-        self._back_surface = pygame.transform.scale(PLAYER_BACK_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
-        self._left_surface = pygame.transform.scale(PLAYER_LEFT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
-        self._right_surface = pygame.transform.scale(PLAYER_RIGHT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
-        self.surface = self._front_surface
+        self.front_surface = pygame.transform.scale(PLAYER_FRONT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
+        self.back_surface = pygame.transform.scale(PLAYER_BACK_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
+        self.left_surface = pygame.transform.scale(PLAYER_LEFT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
+        self.right_surface = pygame.transform.scale(PLAYER_RIGHT_SURFACE, (TILE_WIDTH, PLAYER_HEIGHT))
+        self.surface = self.front_surface
 
         # bounding boxes
         self.bounding_box = pygame.Rect(self.x, self.y, TILE_WIDTH, TILE_WIDTH)
-        self._top_bounding_box = pygame.Rect(self.x, self.y - TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
-        self._bottom_bounding_box = pygame.Rect(self.x, self.y + TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
-        self._left_bounding_box = pygame.Rect(self.x - TILE_WIDTH, self.y, TILE_WIDTH, TILE_WIDTH)
-        self._right_bounding_box = pygame.Rect(self.x + TILE_WIDTH, self.y, TILE_WIDTH, TILE_WIDTH)
+        self.top_bounding_box = pygame.Rect(self.x, self.y - TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
+        self.bottom_bounding_box = pygame.Rect(self.x, self.y + TILE_WIDTH, TILE_WIDTH, TILE_WIDTH)
+        self.left_bounding_box = pygame.Rect(self.x - TILE_WIDTH, self.y, TILE_WIDTH, TILE_WIDTH)
+        self.right_bounding_box = pygame.Rect(self.x + TILE_WIDTH, self.y, TILE_WIDTH, TILE_WIDTH)
 
         self.party: PokemonParty = PokemonParty([Pokemon(1, 5)])
         self.encouter = False
@@ -88,68 +88,3 @@ class Player():
         window.blit(self.surface, (self.x, self.y - TILE_WIDTH // 2))
         if DEBUG:
             pygame.draw.rect(window, RED, self.bounding_box, 1)
-
-    def update(self, entity_list):
-        # check control
-        # TODO: move collision check to openworld
-        # TODO: implement universal input controller instead of saperate input check for battlescene and player
-        if self.camera_x == self.next_camera_x and self.camera_y == self.next_camera_y:
-            keys_pressed = pygame.key.get_pressed()
-            if keys_pressed[pygame.K_a]:
-                self.surface = self._left_surface
-                if not is_bb_collide_with_entity_list(self._left_bounding_box, entity_list):
-                    self.next_camera_x =  self.camera_x + TILE_WIDTH
-            elif keys_pressed[pygame.K_d]:
-                self.surface = self._right_surface
-                if not is_bb_collide_with_entity_list(self._right_bounding_box, entity_list):
-                    self.next_camera_x =  self.camera_x - TILE_WIDTH
-                else:
-                    self.encouter = True
-            elif keys_pressed[pygame.K_w]:
-                self.surface = self._back_surface
-                if not is_bb_collide_with_entity_list(self._top_bounding_box, entity_list):
-                    self.next_camera_y = self.camera_y + TILE_WIDTH
-            elif keys_pressed[pygame.K_s]:
-                self.surface = self._front_surface
-                if not is_bb_collide_with_entity_list(self._bottom_bounding_box, entity_list):
-                    self.next_camera_y = self.camera_y - TILE_WIDTH
-            if keys_pressed[pygame.K_k]:
-                self.running = True
-            else:
-                self.running = False
-        
-        #  update position
-        if not (self.camera_x == self.next_camera_x and self.camera_y == self.next_camera_y):
-            velocity = 4 if self.running else 2
-            move_x = move_y = 0
-            if self.camera_x < self.next_camera_x:
-                move_x = velocity
-            elif self.camera_x > self.next_camera_x:
-                move_x = -velocity
-            if self.camera_y < self.next_camera_y:
-                move_y = velocity
-            elif self.camera_y > self.next_camera_y:
-                move_y = -velocity
-
-            self.camera_x += move_x
-            self.camera_y += move_y
-            move_entity_list(entity_list, move_x, move_y)
-
-
-
-'''
-Helper functions
-'''
-
-def move_entity_list(entity_list, move_x, move_y):
-    for entity in entity_list:
-        entity.x += move_x
-        entity.y += move_y
-        if isinstance(entity, SolidEntity):
-            entity.bounding_box.move_ip(move_x, move_y)
-
-def is_bb_collide_with_entity_list(bb, entity_list):
-    for entity in entity_list:
-        if isinstance(entity, SolidEntity) and bb.colliderect(entity.bounding_box):
-            return True
-    return False
