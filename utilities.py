@@ -3,20 +3,27 @@ import pygame
 from enum import Enum
 
 FPS = 60
-TILE_WIDTH = 32
+TILE_SIZE = 48
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
-GAME_WINDOW_WIDTH = 640
-GAME_WINDOW_HEIGHT = 480
+GAME_WINDOW_WIDTH = TILE_SIZE * 15
+GAME_WINDOW_HEIGHT = TILE_SIZE * 10
+CAMREA_CENTER_X = 7 * TILE_SIZE
+CAMREA_CENTER_Y = 4.5 * TILE_SIZE
 GAME_NAME = "PyEmerald"
+
+A_BUTTON = "./sounds/a-button.mp3"
 
 class SoundPlayer:
 
     def __init__(self):
         mixer.init()
 
+    def A_button(self):
+        mixer.Sound(A_BUTTON).play()
+
     def play_sound(self, sound):
-        pass
+        mixer.Sound(sound).play()
 
     def play_track(self, track):
         mixer.stop()

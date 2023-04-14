@@ -72,6 +72,16 @@ HP_GREEN = HP.subsurface(0, 0, 96, 6)
 HP_YELLOW = HP.subsurface(0, 6, 96, 6)
 HP_RED = HP.subsurface(0, 12, 96, 6)
 
+def get_hp_bar(current_hp, hp):
+    perc = current_hp / hp
+    if perc <= 0.2:
+        bar = HP_RED
+    elif perc <= 0.5:
+        bar = HP_YELLOW
+    else:
+        bar = HP_GREEN
+    return pygame.transform.scale(bar, (int(bar.get_width() * perc), 6))
+
 # coordnates
 DIALOG_BOX_BACKGROUND_COORDINATES = (0, GAME_WINDOW_HEIGHT - 112)
 DIALOG_BOX_COORDINATES = (0, GAME_WINDOW_HEIGHT - 92)
@@ -187,6 +197,7 @@ class Menu(Enum):
     FIGHT = "fight"
     BAG = "bag"
     POKEMON = "pokemon"
+    RUN = "run"
     BATTLE = "battle"
 
 class BattleScene:
@@ -218,8 +229,8 @@ class BattleScene:
         opponent_battling_pokemon_sprite_path = os.path.join("assets/pokemon", str(self.opponent_battling_pokemon.id) + "_front.png")
         surface_1 = pygame.image.load(my_battling_pokemon_sprite_path)
         surface_2 = pygame.image.load(opponent_battling_pokemon_sprite_path)
-        self.my_battling_pokemon_sprite = pygame.transform.scale(surface_1, (TILE_WIDTH * 8, TILE_WIDTH * 8))
-        self.opponent_battling_pokemon_sprite = pygame.transform.scale(surface_2, (TILE_WIDTH * 6, TILE_WIDTH * 6))
+        self.my_battling_pokemon_sprite = pygame.transform.scale(surface_1, (TILE_SIZE * 8, TILE_SIZE * 8))
+        self.opponent_battling_pokemon_sprite = pygame.transform.scale(surface_2, (TILE_SIZE * 6, TILE_SIZE * 6))
 
         offset = find_lowest_pixel_in_transparent_image(opponent_battling_pokemon_sprite_path)
         self.opponent_battling_pokemon_sprite_coordinates = (372, 220 - offset * 2)
@@ -234,29 +245,37 @@ class BattleScene:
             if self.menu == Menu.MAIN:
                     if self.menu_select == 0:
                         if input == INPUT.SELECT:
+                            # Fight menu
                             self.menu = Menu.FIGHT
                             self.move_select = 0
+                            GLOBAL_SOUND_PLAYER.A_button()
                         elif input == INPUT.RIGHT:
                             self.menu_select = 1
                         elif input == INPUT.DOWN:
                             self.menu_select = 2
                     elif self.menu_select == 1:
                         if input == INPUT.SELECT:
+                            # Bag menu
                             self.menu = Menu.BAG
+                            GLOBAL_SOUND_PLAYER.A_button()
                         elif input == INPUT.LEFT:
                             self.menu_select = 0
                         elif input == INPUT.DOWN:
                             self.menu_select = 3
                     elif self.menu_select == 2:
                         if input == INPUT.SELECT:
+                            # Pokemon menu
                             self.menu = Menu.POKEMON
+                            GLOBAL_SOUND_PLAYER.A_button()
                         elif input == INPUT.RIGHT:
                             self.menu_select = 3
                         elif input == INPUT.UP:
                             self.menu_select = 0
                     elif self.menu_select == 3:
                         if input == INPUT.SELECT:
-                            self.is_ended = True
+                            # run away
+                            self.menu = Menu.RUN
+                            self.battle_animation_cooldown = FPS * 2
                         elif input == INPUT.LEFT:
                             self.menu_select = 2
                         elif input == INPUT.UP:
@@ -286,7 +305,18 @@ class BattleScene:
                     self.menu = Menu.BATTLE
                     self.battle_animation_stage = 0
                     self.battle_animation_cooldown = FPS * 2
+                    GLOBAL_SOUND_PLAYER.A_button()
                 elif input == INPUT.BACK:
+                    self.menu = Menu.MAIN
+                    self.input_cooldown = 10
+            elif self.menu == Menu.BAG:
+                # TODO: implement Bag UI
+                if input == INPUT.BACK:
+                    self.menu = Menu.MAIN
+                    self.input_cooldown = 10
+            elif self.menu == Menu.POKEMON:
+                # TODO: implement Pokemon menu UI
+                if input == INPUT.BACK:
                     self.menu = Menu.MAIN
                     self.input_cooldown = 10
         
@@ -405,6 +435,17 @@ class BattleScene:
             self.battle_animation_cooldown -= 1
         elif self.menu == Menu.BAG:
             pass
+        elif self.menu == Menu.POKEMON:
+            pass
+        elif self.menu == Menu.RUN:
+            self.message = "You got away safely!"
+            self.__draw_message()
+            GLOBAL_SOUND_PLAYER.play_sound("./sounds/run_away.mp3")
+            if self.battle_animation_cooldown == 0:
+                self.is_ended = True
+            else:
+                self.battle_animation_cooldown -= 1
+
         # entering battle scene
         if self.open_scene:
             self.open_scene_box_1.move_ip(0, -1)
@@ -416,17 +457,7 @@ class BattleScene:
         pygame.display.update()
 
 def draw_pokemon_sprite_bounding_box():
-    # opponent_pokemon_box = pygame.Surface((TILE_WIDTH * 8, TILE_WIDTH * 8), pygame.SRCALPHA)
+    # opponent_pokemon_box = pygame.Surface((TILE_SIZE * 8, TILE_SIZE * 8), pygame.SRCALPHA)
     # opponent_pokemon_box.fill((0, 0, 0, 192))
     # self.window.blit(opponent_pokemon_box, MY_POKEMON_COORDINATES)
     pass
-
-def get_hp_bar(current_hp, hp):
-    perc = current_hp / hp
-    if perc <= 0.2:
-        bar = HP_RED
-    elif perc <= 0.5:
-        bar = HP_YELLOW
-    else:
-        bar = HP_GREEN
-    return pygame.transform.scale(bar, (int(bar.get_width() * perc), 6))

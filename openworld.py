@@ -7,10 +7,10 @@ from battlescene import *
 
 class OpenWorld:
     def __init__(self, window: Surface, player: Player):
-        self.window = window
-        self.player = player
-        self.entity_list = []
-        self.load_map(player_start_x=15 * TILE_WIDTH, player_start_y=11 * TILE_WIDTH)
+        self.window: Surface = window
+        self.player: Player = player
+        self.entity_list: List[Entity] = []
+        self.load_map(player_start_x=15 * TILE_SIZE, player_start_y=11 * TILE_SIZE)
         self.battle_scene: BattleScene = None
 
     def __add_entity(self, entity):
@@ -36,8 +36,8 @@ class OpenWorld:
                     self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.GROUND2))
                 elif tile == 2:
                     self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.FLOWER))
-                x += TILE_WIDTH
-            y += TILE_WIDTH
+                x += TILE_SIZE
+            y += TILE_SIZE
 
         object_map = map["objects"]
         x = camera_offest_x
@@ -50,9 +50,9 @@ class OpenWorld:
                 elif tile == 4:
                     self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.GRASS))
                 elif tile == 5:
-                    self.__add_entity(SolidEntity(x, y, 3, 3, EntitySurfaceType.TREE))
-                x += TILE_WIDTH
-            y += TILE_WIDTH
+                    self.__add_entity(SolidEntity(x, y, 2, 2, EntitySurfaceType.TREE))
+                x += TILE_SIZE
+            y += TILE_SIZE
 
     def __move_entity_list(self, move_x, move_y):
         for entity in self.entity_list:
@@ -69,50 +69,47 @@ class OpenWorld:
 
     def update_player(self):
         # check control
-        # TODO: move collision check to openworld
         # TODO: implement universal input controller instead of saperate input check for battlescene and player
-
         player = self.player
         camera_x = player.camera_x
         camera_y = player.camera_y
-        next_camera_x = player.next_camera_x
-        next_camera_y = player.next_camera_y
-        if camera_x == next_camera_x and camera_y == next_camera_y:
+        if camera_x == player.next_camera_x and camera_y == player.next_camera_y:
             keys_pressed = pygame.key.get_pressed()
             if keys_pressed[pygame.K_a]:
                 player.surface = player.left_surface
                 if not self.__is_bb_collide_with_entity_list(player.left_bounding_box):
-                    next_camera_x =  camera_x + TILE_WIDTH
+                    player.next_camera_x =  camera_x + TILE_SIZE
             elif keys_pressed[pygame.K_d]:
                 player.surface = player.right_surface
                 if not self.__is_bb_collide_with_entity_list(player.right_bounding_box):
-                    next_camera_x =  camera_x - TILE_WIDTH
+                    player.next_camera_x =  camera_x - TILE_SIZE
                 else:
                     player.encouter = True
             elif keys_pressed[pygame.K_w]:
                 player.surface = player.back_surface
                 if not self.__is_bb_collide_with_entity_list(player.top_bounding_box):
-                    next_camera_y = camera_y + TILE_WIDTH
+                    player.next_camera_y = camera_y + TILE_SIZE
             elif keys_pressed[pygame.K_s]:
                 player.surface = player.front_surface
                 if not self.__is_bb_collide_with_entity_list(player.bottom_bounding_box):
-                    next_camera_y = camera_y - TILE_WIDTH
+                    player.next_camera_y = camera_y - TILE_SIZE
             if keys_pressed[pygame.K_k]:
                 player.running = True
             else:
                 player.running = False
         
         #  update position
-        if not (camera_x == next_camera_x and camera_y == next_camera_y):
+        if not (camera_x == player.next_camera_x and camera_y == player.next_camera_y):
             velocity = 4 if player.running else 2
-            move_x = move_y = 0
-            if camera_x < next_camera_x:
+            move_x = 0
+            move_y = 0
+            if camera_x < player.next_camera_x:
                 move_x = velocity
-            elif camera_x > next_camera_x:
+            elif camera_x > player.next_camera_x:
                 move_x = -velocity
-            if camera_y < next_camera_y:
+            if camera_y < player.next_camera_y:
                 move_y = velocity
-            elif camera_y > next_camera_y:
+            elif camera_y > player.next_camera_y:
                 move_y = -velocity
 
             player.camera_x += move_x
