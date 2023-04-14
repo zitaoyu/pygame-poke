@@ -1,4 +1,4 @@
-from pygame import mixer, Surface
+from pygame import mixer
 import pygame
 from enum import Enum
 
@@ -8,18 +8,19 @@ RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 GAME_WINDOW_WIDTH = TILE_SIZE * 15
 GAME_WINDOW_HEIGHT = TILE_SIZE * 10
-CAMREA_CENTER_X = 7 * TILE_SIZE
-CAMREA_CENTER_Y = 4.5 * TILE_SIZE
+CAMERA_CENTER_X = 7 * TILE_SIZE
+CAMERA_CENTER_Y = 4.5 * TILE_SIZE
 GAME_NAME = "PyEmerald"
 
 A_BUTTON = "./sounds/a-button.mp3"
+
 
 class SoundPlayer:
 
     def __init__(self):
         mixer.init()
 
-    def A_button(self):
+    def a_button(self):
         mixer.Sound(A_BUTTON).play()
 
     def play_sound(self, sound):
@@ -29,6 +30,7 @@ class SoundPlayer:
         mixer.stop()
         mixer.music.load(track)
         mixer.music.play(-1)
+
 
 GLOBAL_SOUND_PLAYER = SoundPlayer()
 
@@ -48,15 +50,19 @@ class Logger:
     def __str__(self) -> str:
         return self.__message.__str__()
 
+
 LOGGER = Logger()
 
-def LOG(log):
+
+def log(log):
     global LOGGER
     LOGGER.push(log)
 
-def GETLOG():
+
+def get_log():
     global LOGGER
     return LOGGER.pop()
+
 
 def find_lowest_pixel_in_transparent_image(image_path):
     import numpy as np
@@ -70,6 +76,7 @@ def find_lowest_pixel_in_transparent_image(image_path):
                 return row_num
     return -1
 
+
 class INPUT(Enum):
     LEFT = "left"
     RIGHT = "right"
@@ -77,7 +84,7 @@ class INPUT(Enum):
     DOWN = "down"
     SELECT = "select"
     BACK = "back"
-    
+
 
 def check_input():
     keys_pressed = pygame.key.get_pressed()
@@ -95,9 +102,3 @@ def check_input():
     elif keys_pressed[pygame.K_k]:
         inputs.append(INPUT.BACK)
     return inputs
-
-a = []
-a.append("1")
-a.append("2")
-a.append("3")
-print(a.pop(0))

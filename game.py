@@ -1,10 +1,5 @@
-import pygame
-pygame.init()
-from pygame.locals import *
-
-from battlescene import *
-from entity import *
 from openworld import *
+
 
 class Game:
     def __init__(self):
@@ -18,7 +13,7 @@ class Game:
         pygame.display.update()
 
     def run(self):
-        print("Game lauched.")
+        print("Game launched.")
         clock = pygame.time.Clock()
         run = True
         while run:
@@ -29,8 +24,10 @@ class Game:
             self.draw_window()
         pygame.quit()
 
+
 def main():
     Game().run()
+
 
 if __name__ == "__main__":
     main()

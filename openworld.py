@@ -1,7 +1,3 @@
-import json
-
-from entity import *
-from utilities import *
 from battlescene import *
 
 
@@ -12,23 +8,24 @@ class OpenWorld:
         self.entity_list: List[Entity] = []
         self.load_map(player_start_x=15 * TILE_SIZE, player_start_y=11 * TILE_SIZE)
         self.battle_scene: BattleScene = None
+        self.background_music = None
 
     def __add_entity(self, entity):
         self.entity_list.append(entity)
 
-    def load_map(self, player_start_x=0, player_start_y=0, map=None):
+    def load_map(self, player_start_x=0, player_start_y=0, game_map=None):
         self.entity_list = []
-        object = json.load(open("./Maps/map.json"))["testMap"]
-        map = object["map"]
-        self.background_music = object["backgroundMusic"]
+        json_object = json.load(open("./Maps/map.json"))["testMap"]
+        game_map = json_object["map"]
+        self.background_music = json_object["backgroundMusic"]
         GLOBAL_SOUND_PLAYER.play_track(self.background_music)
-        camera_offest_x = -(player_start_x - CAMREA_CENTER_X)
-        camera_offest_y = -(player_start_y - CAMREA_CENTER_Y)
+        camera_offset_x = -(player_start_x - CAMERA_CENTER_X)
+        camera_offset_y = -(player_start_y - CAMERA_CENTER_Y)
 
-        ground_map = map["groundTiles"]
-        y = camera_offest_y
+        ground_map = game_map["groundTiles"]
+        y = camera_offset_y
         for row in ground_map:
-            x = camera_offest_x
+            x = camera_offset_x
             for tile in row:
                 if tile == 0:
                     self.__add_entity(Entity(x, y, 1, 1, EntitySurfaceType.GROUND))
@@ -39,11 +36,10 @@ class OpenWorld:
                 x += TILE_SIZE
             y += TILE_SIZE
 
-        object_map = map["objects"]
-        x = camera_offest_x
-        y = camera_offest_y
+        object_map = game_map["objects"]
+        y = camera_offset_y
         for row in object_map:
-            x = camera_offest_x
+            x = camera_offset_x
             for tile in row:
                 if tile == 3:
                     self.__add_entity(SolidEntity(x, y, 1, 1, EntitySurfaceType.MUSH))
@@ -69,7 +65,7 @@ class OpenWorld:
 
     def update_player(self):
         # check control
-        # TODO: implement universal input controller instead of saperate input check for battlescene and player
+        # TODO: implement universal input controller instead of separate input check for battlescene and player
         player = self.player
         camera_x = player.camera_x
         camera_y = player.camera_y
@@ -78,13 +74,13 @@ class OpenWorld:
             if keys_pressed[pygame.K_a]:
                 player.surface = player.left_surface
                 if not self.__is_bb_collide_with_entity_list(player.left_bounding_box):
-                    player.next_camera_x =  camera_x + TILE_SIZE
+                    player.next_camera_x = camera_x + TILE_SIZE
             elif keys_pressed[pygame.K_d]:
                 player.surface = player.right_surface
                 if not self.__is_bb_collide_with_entity_list(player.right_bounding_box):
-                    player.next_camera_x =  camera_x - TILE_SIZE
+                    player.next_camera_x = camera_x - TILE_SIZE
                 else:
-                    player.encouter = True
+                    player.encounter = True
             elif keys_pressed[pygame.K_w]:
                 player.surface = player.back_surface
                 if not self.__is_bb_collide_with_entity_list(player.top_bounding_box):
@@ -97,7 +93,7 @@ class OpenWorld:
                 player.running = True
             else:
                 player.running = False
-        
+
         #  update position
         if not (camera_x == player.next_camera_x and camera_y == player.next_camera_y):
             velocity = 4 if player.running else 2
@@ -118,9 +114,10 @@ class OpenWorld:
 
     def draw_entity_list(self):
         # TODO: better logic to switch between openworld and battlescene
-        if self.player.encouter:
-            self.battle_scene = BattleScene(self.window, BattleManager(self.player.party, PokemonParty([Pokemon(4, 5)])))
-            self.player.encouter = False
+        if self.player.encounter:
+            self.battle_scene = BattleScene(self.window,
+                                            BattleManager(self.player.party, PokemonParty([Pokemon(4, 5)])))
+            self.player.encounter = False
         self.window.fill(WHITE)
         if self.battle_scene:
             if self.battle_scene.is_ended:

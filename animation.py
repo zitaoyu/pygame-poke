@@ -1,11 +1,12 @@
-from utilities import *
+from util import *
+from pygame import Surface
 
-HALF_SEC_INTERVAL = FPS // 2
 
 class Animation:
-    def __init__(self, sprite:Surface, x=0, y=0, x_2=0, y_2=0, num_of_frames=1, padding=0, frame_interval=HALF_SEC_INTERVAL, horizontal=True):
+    def __init__(self, sprite: Surface, x=0, y=0, x_2=0, y_2=0, num_of_frames=1, padding=0,
+                 frame_interval_by_sec=0.5, horizontal=True):
         self.sprite_list = []
-        if x ==0 and y == 0 and x_2 == 0 and y_2 == 0:
+        if x == 0 and y == 0 and x_2 == 0 and y_2 == 0:
             self.sprite_list.append(sprite)
         else:
             x_increment = 0
@@ -16,7 +17,7 @@ class Animation:
                     x_increment += x_2
                 else:
                     y_increment += y_2
-        self.frame_interval = frame_interval
+        self.frame_interval = int(frame_interval_by_sec * FPS)
         self.frame_count = 0
         self.sprite = self.sprite_list[0]
 
